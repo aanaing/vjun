@@ -10,7 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import { Button, Alert, Modal, Box, Typography } from '@mui/material'
 
 import { useMutation } from '@apollo/client'
-import { DELETE_PRODUCT_VARIATION, PRODUCT_VARIATIONS } from '../gql/products'
+import { DELETE_PRODUCT_VARIATION, PRODUCT_VARIATIONS } from '../../gql/products'
 
 const style = {
   position: 'absolute',

@@ -1,10 +1,10 @@
 import React, { useState } from "react"
-import product from "../services/product";
+import product from "../../services/product";
 import { useMutation } from '@apollo/client'
-import { GET_IMAGE_UPLOAD_URL } from '../gql/misc'
-import { CREATE_PRODUCT_VARIATION } from '../gql/products'
+import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
+import { CREATE_PRODUCT_VARIATION } from '../../gql/products'
 
-import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert } from '@mui/material'
+import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button } from '@mui/material'
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -20,7 +20,7 @@ const fileTypes = [
     "image/x-icon"
 ];
 
-const CreateProductVariation = ({ product_id }) => {
+const CreateProductVariation = ({ product_id, handleClose }) => {
 
     const [ loading, setLoading ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
@@ -127,6 +127,10 @@ const CreateProductVariation = ({ product_id }) => {
 
     return (
         <div>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
+                <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Product Variation</Typography>
+                <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
+            </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
                 <CardMedia
                     component="img"

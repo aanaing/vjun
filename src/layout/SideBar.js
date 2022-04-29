@@ -55,12 +55,12 @@ const SideBar = ({ handleDrawerClose, open }) => {
                     Products
                 </ListItem>
             </Link>
-            <Link to="/create-product">
+            <Link to="/orders">
                 <ListItem button>
                     <ListItemIcon>
                         <SummarizeSharpIcon />
                     </ListItemIcon>
-                    Create Product
+                    Orders
                 </ListItem>
             </Link>
         </List>

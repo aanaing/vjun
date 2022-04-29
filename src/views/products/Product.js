@@ -6,15 +6,16 @@ import { PRODUCT_VARIATIONS, DELETE_PRODUCT } from '../../gql/products'
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
   CardActions, Button, Modal, Alert
 } from '@mui/material'
-import ProductVariationTable from '../../components/ProductVariationTable'
-import CreateProductVariation from "../../components/CreateProductVariation"
+import ProductVariationTable from '../../components/products/ProductVariationTable'
+import CreateProductVariation from "../../components/products/CreateProductVariation"
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '80vw',
+  width: '100vw',
+  height: '100vh',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -220,7 +221,7 @@ const Product = ({ homeAlert }) => {
                   aria-describedby="modal-modal-description"
                 >
                   <Box sx={style}>
-                    <CreateProductVariation product_id={product.id} />
+                    <CreateProductVariation product_id={product.id} handleClose={handleClose} />
                   </Box>
                 </Modal>
               </div>

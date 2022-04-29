@@ -12,6 +12,8 @@ import SideBar from '../layout/SideBar';
 const Dashboard = lazy(() => import('./Dashboard'));
 const Products = lazy(() => import('./products/index'))
 const Product = lazy(() => import('./products/Product'))
+const Orders = lazy(() => import('./orders/index'))
+const Order = lazy(() => import('./orders/Order'))
 
 const drawerWidth = 340;
 
@@ -89,6 +91,8 @@ useEffect(() => {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/order/:id" element={<Order />} />
                 </Routes>
               </AuthContext.Provider>
             </Suspense>

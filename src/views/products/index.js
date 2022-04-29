@@ -8,7 +8,7 @@ import {
 import { useLazyQuery } from '@apollo/client'
 import { PRODUCTS } from '../../gql/products'
 
-import CreateProduct from "../../components/CreateProduct"
+import CreateProduct from "../../components/products/CreateProduct"
 
 const style = {
   position: 'absolute',

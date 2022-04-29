@@ -28,7 +28,7 @@ const Index = () => {
   const [open, setOpen] = useState(false);
   const [ count, setCount ] = useState(0)
   const [ page, setPage ] = useState(0)
-  const [ rowsPerPage, setRowsPerPage ] = useState(4)
+  const [ rowsPerPage, setRowsPerPage ] = useState(10)
   const [ offset, setOffset ] = useState(0)
   const [ products, setProducts ] = useState(null)
   const [ search, setSearch ] = useState('')
@@ -196,7 +196,7 @@ const Index = () => {
         ))
       }
       <TablePagination
-        rowsPerPageOptions={[ 4, 10, 25, 100]}
+        rowsPerPageOptions={[ 10, 25, 100]}
         component="div"
         count={count}
         rowsPerPage={rowsPerPage}

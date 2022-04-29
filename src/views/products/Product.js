@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client'
-import { PRODUCT_VARIATIONS, DELETE_PRODUCT } from '../../gql/products'
+import { PRODUCT_BY_ID, DELETE_PRODUCT } from '../../gql/products'
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
   CardActions, Button, Modal, Alert
@@ -37,12 +37,12 @@ const styleP = {
 
 const Product = ({ homeAlert }) => {
 
-    const location = useLocation()
+    // const location = useLocation()
     const navigate = useNavigate()
     const { id } = useParams()
-    const product = location.state.product
+    // const product = location.state.product
 
-    const result = useQuery(PRODUCT_VARIATIONS, { variables: {product_id: id} })
+    const result = useQuery(PRODUCT_BY_ID, { variables: {id: id} })
     const [open, setOpen] = useState(false);
     const [ openP, setOpenP ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
@@ -80,8 +80,10 @@ const Product = ({ homeAlert }) => {
       )
     }
 
+    const product = result.data.products_by_pk
+
     const handleDelete = () => {
-      if(result.data.product_variations.length > 0) {
+      if(product.product_variations.length > 0) {
         setShowAlert({ message: 'Please, make sure all of its variations have been removed.', isError: true })
         setTimeout(() => {
           setShowAlert({ message: '', isError: false })
@@ -225,7 +227,7 @@ const Product = ({ homeAlert }) => {
                   </Box>
                 </Modal>
               </div>
-              <ProductVariationTable variationsProp={result?.data.product_variations} />
+              <ProductVariationTable variationsProp={product?.product_variations} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

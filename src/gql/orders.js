@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const ORDERS = gql`
-query Orders ($limit: Int!, $offset: Int!) {
-    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}) {
+query Orders ($limit: Int!, $offset: Int!, $search: String!) {
+    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {user: {name: {_ilike: $search}}}) {
         created_at
         fk_user_id
         id
@@ -11,6 +11,10 @@ query Orders ($limit: Int!, $offset: Int!) {
         total_price
         total_quantity
         updated_at
+        user {
+          name
+          id
+        }
     }
     user_order_aggregate {
       aggregate {
@@ -31,6 +35,19 @@ query Order_By_Pk ($id: uuid!) {
         total_price
         total_quantity
         updated_at
+        order_items {
+          fk_product_variation_id
+          fk_order_id
+          id
+          quantity
+          order_price_for_one_item
+          created_at
+          updated_at
+        }
+        user {
+          name
+          id
+        }
     }
   }
 `

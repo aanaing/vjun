@@ -11,6 +11,10 @@ export const PRODUCTS = gql`
             price
             product_image_url
             updated_at
+            category {
+                id
+                product_category_name
+            }
         }
         products_aggregate {
             aggregate {
@@ -18,6 +22,33 @@ export const PRODUCTS = gql`
             }
         }
     }
+`
+
+export const PRODUCT_BY_ID = gql`
+query Products_by_pk($id: uuid!) {
+    products_by_pk(id: $id) {
+      category {
+        product_category_name
+      }
+      created_at
+      description
+      id
+      name
+      price
+      product_image_url
+      product_variations {
+        color
+        created_at
+        fk_product_id
+        id
+        price
+        updated_at
+        variation_image_url
+        variation_name
+      }
+      updated_at
+    }
+  }
 `
 
 export const PRODUCT_VARIATIONS = gql`

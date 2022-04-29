@@ -6,24 +6,23 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Avatar from '@mui/material/Avatar';
 
-import { useQuery } from '@apollo/client'
-import { ORDER_ITEMS_BY_ID } from '../../gql/orders'
+// import { useQuery } from '@apollo/client'
+// import { ORDER_ITEMS_BY_ID } from '../../gql/orders'
 
-export default function ProductVariationTable({ id }) {
+export default function ProductVariationTable({ items }) {
 
-    const result = useQuery(ORDER_ITEMS_BY_ID, { variables: { id: id } })
+    // const result = useQuery(ORDER_ITEMS_BY_ID, { variables: { id: id } })
 
-    if(result.loading ) {
-        return (
-          <div>
-            <em>Loading...</em>
-          </div>
-        )
-    }
+    // if(result.loading ) {
+    //     return (
+    //       <div>
+    //         <em>Loading...</em>
+    //       </div>
+    //     )
+    // }
 
-    const items = result.data.order_item
+    // const items = result.data.order_item
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>

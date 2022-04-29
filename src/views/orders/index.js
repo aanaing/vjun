@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Link, useNavigate } from 'react-router-dom'
 import { useLazyQuery } from '@apollo/client'
-import { ORDERS, ORDERS_BY_ID } from '../../gql/orders'
+import { ORDERS } from '../../gql/orders'
 import { 
   Box, Breadcrumbs, Button, TablePagination, TableContainer, Table, TableHead,
   TableBody, TableRow, TableCell, TextField, FormControl, Chip
@@ -15,30 +15,22 @@ const Index = () => {
   const [ rowsPerPage, setRowsPerPage ] = useState(10)
   const [ offset, setOffset ] = useState(0)
   const [ orders, setOrders ] = useState(null)
-  const [ order, setOrder ] = useState(null)
 
   const navigate = useNavigate()
 
   const [ loadOrders, result ] = useLazyQuery(ORDERS)
-  const [ loadOdersById, resultById ] = useLazyQuery(ORDERS_BY_ID)
 
   useEffect(() => {
-    if(search && Number(search)) {
-      loadOdersById({ variables: { id: Number(search) } })
-    } else if(!search) {
-      loadOrders({ variables: { limit: rowsPerPage, offset: offset }})
-    }
-  }, [loadOdersById, loadOrders, offset, rowsPerPage, search])
+    loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%` }})
+  }, [loadOrders, offset, rowsPerPage, search])
 
   useEffect(() => {
-    if(!search && result.data) {
+    if(result.data) {
       setOrders(result.data.user_order)
       setCount(Number(result.data?.user_order_aggregate.aggregate.count))
-    } else if(Number(search) && resultById.data) {
-      setOrder(resultById.data.user_order_by_pk)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, resultById])
+  }, [result ])
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -127,73 +119,34 @@ const Index = () => {
               </TableHead>
               <TableBody>
                 {
-                  !(Number(search)) ? 
-                    orders.map((row, index) => (
-                      <TableRow onClick={() => null} key={index} hover role="checkbox" tabIndex={-1} >
-                          <TableCell>
-                            {row.id}
-                          </TableCell>
-                          <TableCell>
-                            {row.fk_user_id}
-                          </TableCell>
-                          <TableCell>
-                            {row.total_price}
-                          </TableCell>
-                          <TableCell>
-                            {row.total_quantity}
-                          </TableCell>
-                          <TableCell>
-                            <Chip label={row.order_status} variant="outlined" />
-                          </TableCell>
-                          <TableCell >
-                            {row.created_at.substring(0, 10)}
-                          </TableCell>
-                          <TableCell >
-                            {row.updated_at.substring(0, 10)}
-                          </TableCell>
-                          <TableCell>
-                            <Button size="small" onClick={() => detailProdcut(row)}>Detail</Button>
-                          </TableCell>
-                      </TableRow>
-                    ))
-                   : 
-                    order ? (
-                    <TableRow onClick={() => null} hover role="checkbox" tabIndex={-1} >
+                  orders.map((row, index) => (
+                    <TableRow onClick={() => null} key={index} hover role="checkbox" tabIndex={-1} >
                       <TableCell>
-                        {order.id}
+                        {row.id}
                       </TableCell>
                       <TableCell>
-                        {order.fk_user_id}
+                        {row.user.name}
                       </TableCell>
                       <TableCell>
-                        {order.number}
+                        {row.total_price}
                       </TableCell>
                       <TableCell>
-                        {order.fk_user_id}
+                        {row.total_quantity}
                       </TableCell>
                       <TableCell>
-                        {order.totalCost}
-                      </TableCell>
-                      <TableCell>
-                        <Chip label={order.status} variant="outlined" />
+                        <Chip label={row.order_status} variant="outlined" />
                       </TableCell>
                       <TableCell >
-                        {order.created_at.substring(0, 10)}
+                        {row.created_at.substring(0, 10)}
                       </TableCell>
                       <TableCell >
-                        {order.updated_at.substring(0, 10)}
+                        {row.updated_at.substring(0, 10)}
                       </TableCell>
                       <TableCell>
-                        <Button size="small" onClick={() => detailProdcut(order)}>Detail</Button>
+                        <Button size="small" onClick={() => detailProdcut(row)}>Detail</Button>
                       </TableCell>
                     </TableRow>
-                   ) :
-                   (
-                  
-                     <TableRow>
-                        <TableCell colSpan={9}>There is no row!!</TableCell>
-                     </TableRow>
-                  )
+                  ))
                 }
               </TableBody>
             </Table>
@@ -235,19 +188,15 @@ const Index = () => {
             </Accordion>
             )) */}
           }
-          {
-            !(orders.length <= 1 && search) && (
-              <TablePagination
-                rowsPerPageOptions={[ 10, 25, 100]}
-                component="div"
-                count={count}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            )
-          }
+          <TablePagination
+            rowsPerPageOptions={[ 10, 25, 100]}
+            component="div"
+            count={count}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </Box>
     </div>
   )

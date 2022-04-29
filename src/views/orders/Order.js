@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
-import { ORDERS_ITEM_BY_ID, ORDERS_BY_ID } from '../../gql/orders'
+import { ORDERS_BY_ID } from '../../gql/orders'
 import OrdreItemTable from '../../components/orders/OrderItemTable'
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
@@ -75,7 +75,7 @@ const Product = ({ homeAlert }) => {
                               <ListItem>
                                 <ListItemText
                                   primary="User's name"
-                                  secondary={order.fk_user_id}
+                                  secondary={order.user.name}
                                 />
                               </ListItem>
                               <ListItem>
@@ -115,7 +115,7 @@ const Product = ({ homeAlert }) => {
                       </CardContent>
                   </Card>
               </Paper>
-              <OrdreItemTable id={order.id} />
+              <OrdreItemTable items={order.order_items} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

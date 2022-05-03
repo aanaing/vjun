@@ -76,6 +76,7 @@ const CreateProduct = (props) => {
             setTimeout(() => {
                 setShowAlert({ message: '', isError: false })
             }, 1000)
+            setLoading(false)
         },
         onCompleted: () => {
             setValues({name: '', price: '', description: '', product_image_url: '', category: ''})

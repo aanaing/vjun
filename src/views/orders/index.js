@@ -68,7 +68,7 @@ const Index = () => {
         </div>
         <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', my: 2, width: '100%' }} >
           <FormControl sx={{ width: 300 }} >
-            <TextField id="outlined-search" label="Search by User's name or Order's ID" type="search" 
+            <TextField id="outlined-search" label="Search by User's name" type="search" 
               value={search}
               onChange={(e) => { setSearch(e.target.value) }}
             />

@@ -5,7 +5,6 @@ export const PRODUCTS = gql`
         products(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {name: {_ilike: $search}}) {
             created_at
             description
-            fk_product_category
             id
             name
             price
@@ -80,11 +79,10 @@ export const PRODUCT_VARIATIONS_BY_PK = gql`
 `
 
 export const CREATE_PRODUCT = gql`
-    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $description: String!, $category: String!) {
-        insert_products_one(object: {description: $description, name: $name, price: $price, product_image_url: $product_image_url, fk_product_category: $category }) {
+    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $description: String!, $category: uuid!) {
+        insert_products_one(object: {description: $description, name: $name, price: $price, product_image_url: $product_image_url, fk_product_category_id: $category }) {
             created_at
             description
-            fk_product_category
             id
             name
             price

@@ -19,7 +19,7 @@ import Typography from '@mui/material/Typography';
 const Login = () => {
 
     const [values, setValues] = React.useState({
-        phone: '', //
+        name: '', //
         password: '', //
         showPassword: false,
     });
@@ -41,19 +41,21 @@ const Login = () => {
         },
         onCompleted: (result) => {
             console.log(result)
-            setValues({ phone: '', password: '', showPassword: false })
+            setValues({ name: '', password: '', showPassword: false })
             setLoading(false)
-            if(result.LogIn.error) {
-                setShowAlert({ message: result.LogIn.message, isError: true })
+            if(result.AdminLogIn.error) {
+                setShowAlert({ message: result.AdminLogIn.message, isError: true })
                 setTimeout(() => {
                     setShowAlert({ message: '', isError: false })
                 }, 3000)
                 return
             }
-            const decodedToken = jose.decodeJwt(result.LogIn.accessToken)
+            const decodedToken = jose.decodeJwt(result.AdminLogIn.accessToken)
+            console.log(decodedToken)
             const data = JSON.stringify({
-                token: result.LogIn.accessToken,
-                userID: decodedToken.hasura['x-hasura-user-id']
+                token: result.AdminLogIn.accessToken,
+                // userID: decodedToken.hasura['x-hasura-user-id']
+                userID: decodedToken.user_id
             })
             console.log(data)
             window.localStorage.setItem('loggedUser', data)
@@ -78,14 +80,14 @@ const Login = () => {
 
     const handleClick = async () => {
         setErrors({
-            phone: '',
+            name: '',
             password: '',
         })
         setLoading(true);
         let errorExist = false
         const tempErrors = {}
-        if(!values.phone) {
-            tempErrors.phone = 'Phone field is required.'
+        if(!values.name) {
+            tempErrors.name = 'Name field is required.'
             errorExist = true;
         }
         if(!values.password) {
@@ -97,7 +99,8 @@ const Login = () => {
             setLoading(false)
             return
         }
-        postLogin({ variables: { phone: values.phone, password: values.password } })
+        console.log('values : ', values)
+        postLogin({ variables: { name: values.name, password: values.password } })
     }
 
     return (
@@ -121,11 +124,11 @@ const Login = () => {
                     </Box>
                     <Box>
                         <FormControl sx={{ m: 2, width: '300px' }} variant="outlined">
-                            <TextField id="phone" label="Phone"
-                                value={values.phone}
-                                onChange={handleChange('phone')}
-                                error={errors.phone? true: false}
-                                helperText={errors.phone}
+                            <TextField id="name" label="Name"
+                                value={values.name}
+                                onChange={handleChange('name')}
+                                error={errors.name? true: false}
+                                helperText={errors.name}
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2, width: '300px' }} variant="outlined">

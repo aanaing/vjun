@@ -149,7 +149,7 @@ const Index = () => {
                       {row.name}
                     </TableCell>
                     <TableCell >
-                      {row.description}
+                      {row?.description.length > 25 ? row.description.substring(0, 24) + '...': row.description}
                     </TableCell>
                     <TableCell >
                       {row.price}

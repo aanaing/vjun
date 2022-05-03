@@ -13,6 +13,7 @@ const authLink = setContext((_, { headers }) => {
         headers: {
             ...headers,
             Authorization: loggedUserParsed ? `Bearer ${loggedUserParsed.token}` : null,
+            'x-hasura-admin-secret': 'myadminsecretkey'
         }
     }
 })

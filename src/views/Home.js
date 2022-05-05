@@ -14,6 +14,7 @@ const Products = lazy(() => import('./products/index'))
 const Product = lazy(() => import('./products/Product'))
 const Orders = lazy(() => import('./orders/index'))
 const Order = lazy(() => import('./orders/Order'))
+const Categories = lazy(() => import('./categories/index'))
 
 const drawerWidth = 340;
 
@@ -93,6 +94,7 @@ useEffect(() => {
                   <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
                   <Route path="/orders" element={<Orders />} />
                   <Route path="/order/:id" element={<Order />} />
+                  <Route path="/categories" element={<Categories />} />
                 </Routes>
               </AuthContext.Provider>
             </Suspense>

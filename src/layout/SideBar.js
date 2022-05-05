@@ -63,6 +63,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
                     Orders
                 </ListItem>
             </Link>
+            <Link to="/categories">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Categories
+                </ListItem>
+            </Link>
         </List>
     </Drawer>
     )

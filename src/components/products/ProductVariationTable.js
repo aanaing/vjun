@@ -121,11 +121,11 @@ export default function ProductVariationTable({ variationsProp }) {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell >
-                        <Avatar
-                            alt="Product"
-                            src={row.variation_image_url}
-                            sx={{ width: 56, height: 56 }}
-                        >P</Avatar>
+                      <Avatar
+                          alt="Product"
+                          src={row.variation_image_url}
+                          sx={{ width: 56, height: 56 }}
+                      >P</Avatar>
                     </TableCell>
                     <TableCell >
                        {row.variation_name}
@@ -161,8 +161,8 @@ export default function ProductVariationTable({ variationsProp }) {
                       {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                        <Button color="primary">Edit</Button>
-                        <Button color="secondary" onClick={() => handleOpen(row.id)}>Remove</Button>
+                      <Button color="primary">Edit</Button>
+                      <Button color="secondary" onClick={() => handleOpen(row.id)}>Remove</Button>
                     </TableCell>
                   </TableRow>
                 );

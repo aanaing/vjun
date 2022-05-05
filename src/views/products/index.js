@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link, useNavigate } from 'react-router-dom'
 import { 
   Box, Breadcrumbs, Typography, Card, CardMedia, CardContent, Button, Modal, TablePagination, TableContainer, Table, TableHead,
-  TableBody, TableRow, TableCell, TextField, FormControl
+  TableBody, TableRow, TableCell, TextField, FormControl, Avatar
 } from '@mui/material'
 
 import { useLazyQuery } from '@apollo/client'
@@ -25,7 +25,7 @@ const style = {
 const Index = () => {
 
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
   const [ count, setCount ] = useState(0)
   const [ page, setPage ] = useState(0)
   const [ rowsPerPage, setRowsPerPage ] = useState(10)
@@ -115,6 +115,9 @@ const Index = () => {
               <TableCell style={{ minWidth: 170 }}>
                 ID
               </TableCell>
+              <TableCell style={{ minWidth: 60 }}>
+                Image
+              </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Name
               </TableCell>
@@ -144,6 +147,13 @@ const Index = () => {
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell >
                       {row.id}
+                    </TableCell>
+                    <TableCell>
+                      <Avatar
+                        alt="Product"
+                        src={row.product_image_url}
+                        sx={{ width: 56, height: 56 }}
+                      >P</Avatar>
                     </TableCell>
                     <TableCell >
                       {row.name}

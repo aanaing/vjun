@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Link, useLocation, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client'
 import { PRODUCT_BY_ID, DELETE_PRODUCT } from '../../gql/products'
 
@@ -37,10 +37,8 @@ const styleP = {
 
 const Product = ({ homeAlert }) => {
 
-    // const location = useLocation()
     const navigate = useNavigate()
     const { id } = useParams()
-    // const product = location.state.product
 
     const result = useQuery(PRODUCT_BY_ID, { variables: {id: id} })
     const [open, setOpen] = useState(false);
@@ -212,7 +210,7 @@ const Product = ({ homeAlert }) => {
                           <Button onClick={handleDelete} >Confirm</Button>
                         </Box>
                       </Box>
-                    </Modal>
+                  </Modal>
               </Paper>
               <div style={{ minHeight: 'auto' }}>
                 <Button onClick={handleOpen} variant="contained">{open? 'Close' : 'New Variation'}</Button>

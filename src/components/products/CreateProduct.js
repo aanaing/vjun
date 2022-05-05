@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import product from "../../services/product";
+import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
 import { CREATE_PRODUCT, CATEGORIES } from '../../gql/products'

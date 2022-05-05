@@ -15,6 +15,11 @@ query Orders ($limit: Int!, $offset: Int!, $search: String!) {
           name
           id
         }
+        address {
+          address
+          city
+          phone
+        }
     }
     user_order_aggregate {
       aggregate {
@@ -47,6 +52,11 @@ query Order_By_Pk ($id: uuid!) {
         user {
           name
           id
+        }
+        address {
+          address
+          city
+          phone
         }
     }
   }

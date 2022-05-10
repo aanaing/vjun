@@ -186,7 +186,7 @@ const Product = ({ homeAlert }) => {
                         <Button size="small" color="primary">
                           Edit
                         </Button>
-                        <Button size="small" color="secondary" onClick={handleOpenP}>
+                        <Button size="small" color="error" onClick={handleOpenP}>
                           Remove
                         </Button>
                       </CardActions>

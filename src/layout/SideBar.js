@@ -71,6 +71,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
                     Categories
                 </ListItem>
             </Link>
+            <Link to="/users">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Users
+                </ListItem>
+            </Link>
         </List>
     </Drawer>
     )

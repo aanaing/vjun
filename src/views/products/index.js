@@ -71,7 +71,7 @@ const Index = () => {
   }
 
   const detailProdcut = (product) => {
-    navigate(`/product/${product.id}`, { state: { product: product } })
+    navigate(`/product/${product.id}`)
   }
 
   return (
@@ -174,7 +174,7 @@ const Index = () => {
                       {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                      <Button size="small" onClick={() => detailProdcut(row)}>Detail</Button>
+                      <Button size="small" color="secondary" onClick={() => detailProdcut(row)}>Detail</Button>
                     </TableCell>
                   </TableRow>
                 );

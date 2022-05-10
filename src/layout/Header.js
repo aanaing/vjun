@@ -7,8 +7,12 @@ import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
+import { Typography, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'
+
+import { useQuery } from '@apollo/client'
+import { PENDING_ORDERS } from '../gql/orders'
 
 const drawerWidth = 340;
 
@@ -31,23 +35,36 @@ const AppBar = styled(MuiAppBar, {
 
 const Header = ({ handleDrawerOpen, open }) => {
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const navigate = useNavigate()
+    const [anchorEl, setAnchorEl] = React.useState(null)
+
+    const { data, loading } = useQuery(PENDING_ORDERS, { variables: { status: '%pending%' } })
 
     const handleMenu = (event) => {
-        setAnchorEl(event.currentTarget);
+      setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
-        setAnchorEl(null);
+      setAnchorEl(null);
     };
 
     const handleLogout = () => {
       window.localStorage.removeItem('loggedUser')
     //   history.push('/login')
+      navigate('/login')
+    }
+
+    
+    if(loading) {
+      return (
+        <div>
+          <em>Loading...</em>
+        </div>
+      )
     }
 
     return (
-        <AppBar position="fixed" open={open} sx={{ bgcolor: '#4b26d1' }} >
+        <AppBar position="fixed" open={open} sx={{ bgcolor: '#c4c4c4', color: 'black' }} >
         <Toolbar>
           <IconButton
             size="large"
@@ -62,6 +79,7 @@ const Header = ({ handleDrawerOpen, open }) => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 V.Jun Dashboard
             </Typography>
+            <Chip label={`Pending Orders: ${data?.user_order_aggregate?.aggregate?.count}`} color="primary" variant="outlined" />
             <div>
               <IconButton
                 size="large"

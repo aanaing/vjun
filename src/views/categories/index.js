@@ -194,7 +194,7 @@ const Index = () => {
                     </TableCell>
                     <TableCell >
                       <Button color="primary" onClick={() => handleOpenE(row)}>Edit</Button>
-                      <Button color="secondary" onClick={() => handleOpenC(row)} >Remove</Button>
+                      <Button color="error" onClick={() => handleOpenC(row)} >Remove</Button>
                     </TableCell>
                     </TableRow>
                   ))

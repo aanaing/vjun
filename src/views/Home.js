@@ -15,6 +15,8 @@ const Product = lazy(() => import('./products/Product'))
 const Orders = lazy(() => import('./orders/index'))
 const Order = lazy(() => import('./orders/Order'))
 const Categories = lazy(() => import('./categories/index'))
+const Users = lazy(() => import('./users/index'))
+const User = lazy(() => import('./users/User'))
 
 const drawerWidth = 340;
 
@@ -81,30 +83,32 @@ useEffect(() => {
 
   return (
     <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <Header open={open} handleDrawerOpen={handleDrawerOpen} />
+      <CssBaseline />
+      <Header open={open} handleDrawerOpen={handleDrawerOpen} />
     <SideBar handleDrawerClose={handleDrawerClose} open={open} />
-        <Main open={open}>
-            <DrawerHeader />
-            <Suspense fallback={<div>Loading...</div>}>
-              <AuthContext.Provider value={auth}>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
-                  <Route path="/orders" element={<Orders />} />
-                  <Route path="/order/:id" element={<Order />} />
-                  <Route path="/categories" element={<Categories />} />
-                </Routes>
-              </AuthContext.Provider>
-            </Suspense>
-        </Main>
-        {
-          (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
-        }
-        {
-          (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="warning">{showAlert.message}</Alert>
-        }
+      <Main open={open}>
+          <DrawerHeader />
+          <Suspense fallback={<div>Loading...</div>}>
+            <AuthContext.Provider value={auth}>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/order/:id" element={<Order />} />
+                <Route path="/categories" element={<Categories />} />
+                <Route path='/users' element={<Users />} />
+                <Route path='/user/:id' element={<User />} />
+              </Routes>
+            </AuthContext.Provider>
+          </Suspense>
+      </Main>
+      {
+        (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
+      }
+      {
+        (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="warning">{showAlert.message}</Alert>
+      }
     </Box>
   );
 }

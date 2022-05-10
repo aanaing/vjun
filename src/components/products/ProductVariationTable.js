@@ -162,7 +162,7 @@ export default function ProductVariationTable({ variationsProp }) {
                     </TableCell>
                     <TableCell >
                       <Button color="primary">Edit</Button>
-                      <Button color="secondary" onClick={() => handleOpen(row.id)}>Remove</Button>
+                      <Button color="error" onClick={() => handleOpen(row.id)}>Remove</Button>
                     </TableCell>
                   </TableRow>
                 );

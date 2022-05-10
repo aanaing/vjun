@@ -1,18 +1,16 @@
-import React, { useState } from "react"
+import React from "react"
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { ORDERS_BY_ID } from '../../gql/orders'
 import OrdreItemTable from '../../components/orders/OrderItemTable'
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
- Alert
 } from '@mui/material'
 
-const Product = ({ homeAlert }) => {
+const Product = () => {
 
     const { id } = useParams()
 
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const result = useQuery(ORDERS_BY_ID, { variables: { id: id } })
 
     if(result.loading ) {
@@ -59,10 +57,10 @@ const Product = ({ homeAlert }) => {
                       </CardHeader>
                       <CardContent sx={{ display: 'flex' }}>
                           <CardMedia sx={{ flex: 1 }}
-                              component="img"
-                              height="194"
-                              image={order.payment_screenshot_image_url}
-                              alt="Payment screenshot"
+                            component="img"
+                            height="194"
+                            image={order.payment_screenshot_image_url}
+                            alt="Payment screenshot"
                           />
                           <Paper sx={{flex: 4, mx: 3, display: 'flex', justifyContent: 'space-around' }}>
                             <Box>
@@ -82,6 +80,12 @@ const Product = ({ homeAlert }) => {
                                 <ListItemText
                                   primary="Status"
                                   secondary={order.order_status}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Payment Method"
+                                  secondary={order.payment_method}
                                 />
                               </ListItem>
                             </Box>
@@ -117,12 +121,6 @@ const Product = ({ homeAlert }) => {
               </Paper>
               <OrdreItemTable items={order.order_items} />
           </Box>
-          {
-            (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
-          }
-          {
-            (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="warning">{showAlert.message}</Alert>
-          }
         </div>
     )
 }

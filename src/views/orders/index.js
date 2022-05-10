@@ -1,58 +1,54 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { Link, useNavigate } from 'react-router-dom'
-import { useLazyQuery } from '@apollo/client'
-import { ORDERS } from '../../gql/orders'
 import { 
-  Box, Breadcrumbs, Button, TablePagination, TableContainer, Table, TableHead,
-  TableBody, TableRow, TableCell, TextField, FormControl, Chip
+  Box, Breadcrumbs, Tabs, Tab, 
 } from '@mui/material'
+import Pending from "../../components/orders/Pending"
+import PaymentVerified from "../../components/orders/PaymentVerified"
+import Delivering from "../../components/orders/Delivering"
+import Completed from "../../components/orders/Completed"
+
+import PropTypes from 'prop-types';
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
 
 const Index = () => {
 
-  const [ search, setSearch ] = useState('')
-  const [ count, setCount ] = useState(0)
-  const [ page, setPage ] = useState(0)
-  const [ rowsPerPage, setRowsPerPage ] = useState(10)
-  const [ offset, setOffset ] = useState(0)
-  const [ orders, setOrders ] = useState(null)
+  const [value, setValue] = useState(0);
 
   const navigate = useNavigate()
 
-  const [ loadOrders, result ] = useLazyQuery(ORDERS)
-
-  useEffect(() => {
-    loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%` }})
-  }, [loadOrders, offset, rowsPerPage, search])
-
-  useEffect(() => {
-    if(result.data) {
-      setOrders(result.data.user_order)
-      setCount(Number(result.data?.user_order_aggregate.aggregate.count))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result ])
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-    setOffset(rowsPerPage * newPage)
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value)
-    setPage(0);
-  };
-
-  if(!orders) {
-    return (
-      <div>
-        <em>Loading...</em>
-      </div>
-    )
+  const detailOrder = (order) => {
+    navigate(`/order/${order.id}`)
   }
 
-  const detailProdcut = (product) => {
-    navigate(`/order/${product.id}`)
-  }
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   return (
     <div>
@@ -66,137 +62,28 @@ const Index = () => {
             </span>
           </Breadcrumbs>
         </div>
-        <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', my: 2, width: '100%' }} >
-          <FormControl sx={{ width: 300 }} >
-            <TextField id="outlined-search" label="Search by User's name" type="search" 
-              value={search}
-              onChange={(e) => { setSearch(e.target.value) }}
-            />
-          </FormControl>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexFlow: 'wrap row',
-            '& > :not(style)': {
-              m: 1,
-              width: '100%',
-              minHeight: '25vh',
-            },
-            }}
-        >
-        {
-        (window.innerWidth > 820) ? (
-          <TableContainer sx={{ maxHeight: '75vh' }}>
-            <Table stickyHeader aria-label="sticky table">
-              <TableHead>
-                <TableRow>
-                    <TableCell style={{ minWidth: 10 }} >
-                      ID
-                    </TableCell>
-                    <TableCell style={{ minWidth: 100 }} >
-                      User Name
-                    </TableCell>
-                    <TableCell style={{ minWidth: 70 }} >
-                      Total Price
-                    </TableCell>
-                    <TableCell style={{ minWidth: 70 }} >
-                      Total Quantity
-                    </TableCell>
-                    <TableCell style={{ minWidth: 30 }} >
-                      Status
-                    </TableCell>
-                    <TableCell style={{ minWidth: 70 }} >
-                      Updated At
-                    </TableCell>
-                    <TableCell style={{ minWidth: 70 }} >
-                      Created At
-                    </TableCell>
-                    <TableCell style={{ minWidth: 70 }} >
-                      Detail
-                    </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  orders.map((row, index) => (
-                    <TableRow onClick={() => null} key={index} hover role="checkbox" tabIndex={-1} >
-                      <TableCell>
-                        {row.id}
-                      </TableCell>
-                      <TableCell>
-                        {row.user.name}
-                      </TableCell>
-                      <TableCell>
-                        {row.total_price}
-                      </TableCell>
-                      <TableCell>
-                        {row.total_quantity}
-                      </TableCell>
-                      <TableCell>
-                        <Chip label={row.order_status} variant="outlined" />
-                      </TableCell>
-                      <TableCell >
-                        {row.created_at.substring(0, 10)}
-                      </TableCell>
-                      <TableCell >
-                        {row.updated_at.substring(0, 10)}
-                      </TableCell>
-                      <TableCell>
-                        <Button size="small" onClick={() => detailProdcut(row)}>Detail</Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                }
-              </TableBody>
-            </Table>
-          </TableContainer>
-        ) : 
-          {/* orders?.rows?.map((order, index) => (
-            <Accordion sx={{my: 2, bgcolor: '#b3e5fc'}} expanded={expanded === index} onChange={handleChange(index)} key={index}>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1bh-content"
-                id={`${index}bh-header`}
-              >
-                <Typography sx={{ width: '10%', flexShrink: 0 }}>
-                  {order.id}
-                </Typography>
-                <Typography sx={{ color: 'text.secondary' }}>Number : {order.number}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography component="div" variant="body2" color="text"
-                  sx={{p: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}
-                >
-                  <ListItem sx={{ flex: 1}} className="scroll-paragraph">
-                    <ListItemText primary="Total Quantity" secondary={order?.totalQuantity} />
-                  </ListItem>
-                  <ListItem sx={{ flex: 1}} className="scroll-paragraph">
-                    <ListItemText primary="Total Cost" secondary={order?.totalCost} />
-                  </ListItem>
-                  <ListItem sx={{ flex: 1, minWidth: 200}} className="scroll-paragraph">
-                    <ListItemText primary="Status" secondary={order?.status} />
-                  </ListItem>
-                  <ListItem sx={{ flex: 1}} className="scroll-paragraph">
-                    <ListItemText primary="Created At" secondary={order?.createdAt.substring(0, 10)} />
-                  </ListItem>
-                </Typography>
-              </AccordionDetails>
-              <AccordionActions>
-                <Button onClick={() => handleRoute(order.id)} >See more</Button>
-              </AccordionActions>
-            </Accordion>
-            )) */}
-          }
-          <TablePagination
-            rowsPerPageOptions={[ 10, 25, 100]}
-            component="div"
-            count={count}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+
+        <Box sx={{ width: '100%' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+              <Tab label="Pending" id='tab-pending' aria-controls='tabpanel-pending' />
+              <Tab label="Payment Verified" id='tab-payment-verified' aria-controls='tabpanel-payment-verified' />
+              <Tab label="Delivering" id='tab-delivering' aria-controls='tabpanel-delivering' />
+              <Tab label="Completed" id='tab-completed' aria-controls='tabpanel-completed' />
+            </Tabs>
+          </Box>
+          <TabPanel value={value} index={0}>
+            <Pending detailOrder={detailOrder} />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+            <PaymentVerified detailOrder={detailOrder} />
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <Delivering detailOrder={detailOrder} />
+          </TabPanel>
+          <TabPanel value={value} index={3}>
+            <Completed detailOrder={detailOrder} />
+          </TabPanel>
         </Box>
     </div>
   )

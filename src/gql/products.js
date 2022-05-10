@@ -14,6 +14,9 @@ export const PRODUCTS = gql`
                 id
                 product_category_name
             }
+            brand_name {
+                name
+            }
         }
         products_aggregate {
             aggregate {
@@ -45,13 +48,16 @@ query Products_by_pk($id: uuid!) {
         variation_image_url
         variation_name
       }
+      brand_name {
+        name
+      }
       updated_at
     }
   }
 `
 
 export const PRODUCT_VARIATIONS = gql`
-    query Produc_variations($product_id: uuid!) {
+    query Product_variations($product_id: uuid!) {
         product_variations(where: {fk_product_id: {_eq: $product_id}}) {
             created_at
             fk_product_id

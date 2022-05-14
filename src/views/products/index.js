@@ -87,7 +87,7 @@ const Index = () => {
       </Breadcrumbs>
     </div>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} >
-      <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'New Variation'}</Button>
+      <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'New Product'}</Button>
       <FormControl sx={{ width: 300 }} >
         <TextField id="outlined-search" label="Search by Name" type="search" 
           value={search}

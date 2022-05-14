@@ -21,7 +21,7 @@ const Product = () => {
       )
     }
 
-    const order = result.data.user_order_by_pk
+    const order = result?.data.user_order_by_pk
 
     return (
         <div>
@@ -38,7 +38,7 @@ const Product = () => {
               </span>
             </Breadcrumbs>
           </div>
-          <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Products</Typography>
+          <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Orders</Typography>
             <Box
                 sx={{
                 display: 'flex',

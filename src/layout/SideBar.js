@@ -9,6 +9,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import SummarizeSharpIcon from '@mui/icons-material/SummarizeSharp';
+import{ Box, Avatar } from '@mui/material'
+import logo from '../static/logo192.png'
 
 import { Link } from 'react-router-dom';
 const drawerWidth = 340;
@@ -40,21 +42,16 @@ const SideBar = ({ handleDrawerClose, open }) => {
         anchor="left"
         open={open}
     >
-        <DrawerHeader>
+        <DrawerHeader sx={{ bgcolor: '#c4c4c4' }} >
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }} >
+                <Avatar alt="Remy Sharp" src={logo} />
+            </Box>
         <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
         </IconButton>
         </DrawerHeader>
         <Divider />
         <List>
-            <Link to="/products">
-                <ListItem button>
-                    <ListItemIcon>
-                        <SummarizeSharpIcon />
-                    </ListItemIcon>
-                    Products
-                </ListItem>
-            </Link>
             <Link to="/orders">
                 <ListItem button>
                     <ListItemIcon>
@@ -63,12 +60,20 @@ const SideBar = ({ handleDrawerClose, open }) => {
                     Orders
                 </ListItem>
             </Link>
-            <Link to="/categories">
+            <Link to="/products">
                 <ListItem button>
                     <ListItemIcon>
                         <SummarizeSharpIcon />
                     </ListItemIcon>
-                    Categories
+                    Products
+                </ListItem>
+            </Link>
+            <Link to="/loyalty_products">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Loyalty Products
                 </ListItem>
             </Link>
             <Link to="/users">
@@ -77,6 +82,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
                         <SummarizeSharpIcon />
                     </ListItemIcon>
                     Users
+                </ListItem>
+            </Link>
+            <Link to="/categories">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Categories
                 </ListItem>
             </Link>
         </List>

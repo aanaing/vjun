@@ -8,7 +8,6 @@ import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import { Typography, Chip } from '@mui/material';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom'
 
 import { useQuery } from '@apollo/client'
@@ -79,7 +78,9 @@ const Header = ({ handleDrawerOpen, open }) => {
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 V.Jun Dashboard
             </Typography>
-            <Chip label={`Pending Orders: ${data?.user_order_aggregate?.aggregate?.count}`} color="primary" variant="outlined" />
+            <strong>
+              <Chip label={`Pending Orders: ${data?.user_order_aggregate?.aggregate?.count}`} color="error" variant="outlined" />
+            </strong>
             <div>
               <IconButton
                 size="large"
@@ -106,9 +107,9 @@ const Header = ({ handleDrawerOpen, open }) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
               >
-                <MenuItem onClick={handleClose}>
+                {/* <MenuItem onClick={handleClose}>
                   <Link to='/profile'>Profile</Link>
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </div>

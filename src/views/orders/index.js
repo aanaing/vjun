@@ -67,7 +67,7 @@ const Index = () => {
           <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
               <Tab label="Pending" id='tab-pending' aria-controls='tabpanel-pending' />
-              <Tab label="Payment Verified" id='tab-payment-verified' aria-controls='tabpanel-payment-verified' />
+              <Tab label="Verified" id='tab-payment-verified' aria-controls='tabpanel-payment-verified' />
               <Tab label="Delivering" id='tab-delivering' aria-controls='tabpanel-delivering' />
               <Tab label="Completed" id='tab-completed' aria-controls='tabpanel-completed' />
             </Tabs>

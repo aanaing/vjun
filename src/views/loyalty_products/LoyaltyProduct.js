@@ -1,26 +1,13 @@
 import React, { useState } from "react"
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation } from '@apollo/client'
-import { PRODUCT_BY_ID, DELETE_PRODUCT } from '../../gql/products'
+import { useQuery } from '@apollo/client'
+import { PRODUCT } from '../../gql/loyalty_products'
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
   CardActions, Button, Modal, Alert
 } from '@mui/material'
-import ProductVariationTable from '../../components/products/ProductVariationTable'
-import CreateProductVariation from "../../components/products/CreateProductVariation"
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '100vw',
-  height: '100vh',
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
+import LoyaltyProductVariationTable from "../../components/LoyaltyProducts/LoyaltyProductVariationTable"
 
 const styleP = {
   position: 'absolute',
@@ -34,14 +21,12 @@ const styleP = {
   p: 4,
 };
 
-
-const Product = ({ homeAlert }) => {
+const LoyaltyProduct = ({ homeAlert }) => {
 
     const navigate = useNavigate()
     const { id } = useParams()
 
-    const result = useQuery(PRODUCT_BY_ID, { variables: {id: id} })
-    const [open, setOpen] = useState(false);
+    const result = useQuery(PRODUCT, { variables: {id: id} })
     const [ openP, setOpenP ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
 
@@ -50,25 +35,6 @@ const Product = ({ homeAlert }) => {
       setOpenP(true)
     }
     const handleCloseP = () => setOpenP(false)
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-      result.refetch()
-      setOpen(false)
-    };
-
-    const [ deleteProduct ] = useMutation(DELETE_PRODUCT, {
-      onError: (error) => {
-        console.log('error : ', error)
-        setShowAlert({ message: 'Error on server', isError: true })
-        setTimeout(() => {
-          setShowAlert({ message: '', isError: false })
-        }, 3000)
-      },
-      onCompleted: () => {
-        homeAlert('Product have been removed.', false)
-        navigate('/products')
-      },
-    })
 
     if(result.loading) {
       return (
@@ -78,21 +44,7 @@ const Product = ({ homeAlert }) => {
       )
     }
 
-    const product = result.data.products_by_pk
-
-    const handleDelete = () => {
-      if(product.product_variations.length > 0) {
-        setShowAlert({ message: 'Please, make sure all of its variations have been removed.', isError: true })
-        setTimeout(() => {
-          setShowAlert({ message: '', isError: false })
-        }, 3000)
-        setOpenP(false)
-        return
-      }
-      let image_url = product.product_image_url
-      let image_name = image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght )
-      deleteProduct({ variables: {id: product.id, image_name: image_name} })
-    }
+    const product = result.data.loyality_products_by_pk
 
     return (
         <div>
@@ -101,15 +53,15 @@ const Product = ({ homeAlert }) => {
               <Link to="/">
                 Dashboard
               </Link>
-              <Link to="/products">
-                Products
+              <Link to="/loyalty_products">
+                Loyalty Products
               </Link>
               <span>
                 {id}
               </span>
             </Breadcrumbs>
           </div>
-          <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Product</Typography>
+          <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Loyalty Product</Typography>
             <Box
                 sx={{
                 display: 'flex',
@@ -124,7 +76,7 @@ const Product = ({ homeAlert }) => {
               <Paper elevation={3} >
                   <Card>
                       <CardHeader>
-                        <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>Product</Typography>
+                          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>Product</Typography>
                       </CardHeader>
                       <CardContent sx={{ display: 'flex' }}>
                           <CardMedia sx={{ flex: 1 }}
@@ -149,8 +101,14 @@ const Product = ({ homeAlert }) => {
                               </ListItem>
                               <ListItem>
                                 <ListItemText
-                                  primary="Price"
-                                  secondary={product.price}
+                                  primary="Point Price"
+                                  secondary={product.point_price}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Brand"
+                                  secondary={product.brand_name.name}
                                 />
                               </ListItem>
                               <ListItem>
@@ -161,10 +119,22 @@ const Product = ({ homeAlert }) => {
                               </ListItem>
                             </Box>
                             <Box>
+                                <ListItem>
+                                    <ListItemText
+                                    primary="Claimed Amount"
+                                    secondary={product.claimed_amount}
+                                    />
+                              </ListItem>
                               <ListItem>
                                 <ListItemText
                                   primary="Category"
-                                  secondary={product.fk_product_category}
+                                  secondary={product.product_category?.product_category_name}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Expired Date"
+                                  secondary={product.expiry_date}
                                 />
                               </ListItem>
                               <ListItem>
@@ -207,25 +177,12 @@ const Product = ({ homeAlert }) => {
                         </Typography>
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                           <Button color='secondary' onClick={handleCloseP} >Cancel</Button>
-                          <Button onClick={handleDelete} >Confirm</Button>
+                          <Button >Confirm</Button>
                         </Box>
                       </Box>
                   </Modal>
               </Paper>
-              <div style={{ minHeight: 'auto' }}>
-                <Button onClick={handleOpen} variant="contained">{open? 'Close' : 'New Variation'}</Button>
-                <Modal
-                  open={open}
-                  onClose={handleClose}
-                  aria-labelledby="modal-modal-title"
-                  aria-describedby="modal-modal-description"
-                >
-                  <Box sx={style}>
-                    <CreateProductVariation product_id={product.id} handleClose={handleClose} />
-                  </Box>
-                </Modal>
-              </div>
-              <ProductVariationTable variationsProp={product?.product_variations} />
+              <LoyaltyProductVariationTable variationsProp={product?.loyalty_products_variations} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
@@ -237,4 +194,4 @@ const Product = ({ homeAlert }) => {
     )
 }
 
-export default Product
+export default LoyaltyProduct

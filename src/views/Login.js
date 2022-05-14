@@ -15,6 +15,7 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
+import logo from '../static/logo192.png'
 
 const Login = () => {
 
@@ -112,9 +113,11 @@ const Login = () => {
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    textAlign: 'center'
+                    textAlign: 'center',
+                    bgcolor: '#c4c4c4',
                 }} >
-                    <Box  sx={{ m: 5 }}>
+                    <Box  sx={{ m: 1 }}>
+                        <img alt="V.Jun" src={logo} width="130" />
                         <Typography variant='h4' paragraph>
                            V.Jun Admin Dashboard
                         </Typography>

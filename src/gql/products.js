@@ -18,7 +18,7 @@ export const PRODUCTS = gql`
                 name
             }
         }
-        products_aggregate {
+        products_aggregate(where: {name: {_ilike: $search}}) {
             aggregate {
               count
             }

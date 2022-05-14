@@ -9,7 +9,7 @@ import { Alert } from '@mui/material'
 import Header from '../layout/Header';
 import SideBar from '../layout/SideBar';
 
-const Dashboard = lazy(() => import('./Dashboard'));
+// const Dashboard = lazy(() => import('./Dashboard'));
 const Products = lazy(() => import('./products/index'))
 const Product = lazy(() => import('./products/Product'))
 const Orders = lazy(() => import('./orders/index'))
@@ -17,6 +17,8 @@ const Order = lazy(() => import('./orders/Order'))
 const Categories = lazy(() => import('./categories/index'))
 const Users = lazy(() => import('./users/index'))
 const User = lazy(() => import('./users/User'))
+const LoyaltyProducts = lazy(() => import('./loyalty_products/index'))
+const LoyaltyProduct = lazy(() => import('./loyalty_products/LoyaltyProduct'))
 
 const drawerWidth = 340;
 
@@ -91,7 +93,7 @@ useEffect(() => {
           <Suspense fallback={<div>Loading...</div>}>
             <AuthContext.Provider value={auth}>
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Orders />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
                 <Route path="/orders" element={<Orders />} />
@@ -99,6 +101,8 @@ useEffect(() => {
                 <Route path="/categories" element={<Categories />} />
                 <Route path='/users' element={<Users />} />
                 <Route path='/user/:id' element={<User />} />
+                <Route path='/loyalty_products' element={<LoyaltyProducts />} />
+                <Route path='/loualty_product/:id' element={<LoyaltyProduct />} />
               </Routes>
             </AuthContext.Provider>
           </Suspense>

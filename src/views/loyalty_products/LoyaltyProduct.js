@@ -7,8 +7,6 @@ import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, Car
   CardActions, Button, Modal, Alert
 } from '@mui/material'
 
-import LoyaltyProductVariationTable from "../../components/LoyaltyProducts/LoyaltyProductVariationTable"
-
 const styleP = {
   position: 'absolute',
   top: '50%',
@@ -21,6 +19,7 @@ const styleP = {
   p: 4,
 };
 
+
 const LoyaltyProduct = ({ homeAlert }) => {
 
     const navigate = useNavigate()
@@ -28,7 +27,7 @@ const LoyaltyProduct = ({ homeAlert }) => {
 
     const result = useQuery(PRODUCT, { variables: {id: id} })
     const [ openP, setOpenP ] = useState(false)
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
+    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
 
     const handleOpenP = () => {
       result.refetch()
@@ -44,7 +43,7 @@ const LoyaltyProduct = ({ homeAlert }) => {
       )
     }
 
-    const product = result.data.loyality_products_by_pk
+    const product = result.data.loyalty_products_by_pk
 
     return (
         <div>
@@ -121,8 +120,8 @@ const LoyaltyProduct = ({ homeAlert }) => {
                             <Box>
                                 <ListItem>
                                     <ListItemText
-                                    primary="Claimed Amount"
-                                    secondary={product.claimed_amount}
+                                    primary="Amount Left"
+                                    secondary={product.amount_left}
                                     />
                               </ListItem>
                               <ListItem>
@@ -182,7 +181,6 @@ const LoyaltyProduct = ({ homeAlert }) => {
                       </Box>
                   </Modal>
               </Paper>
-              <LoyaltyProductVariationTable variationsProp={product?.loyalty_products_variations} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

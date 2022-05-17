@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react"
-import imageService from "../../services/image";
+import React, { useState } from "react"
+import product from "../../services/image";
 import { useMutation } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
-import { UPDATE_CATEGORY } from '../../gql/categories'
+import { CREATE_VARIATION } from '../../gql/loyalty_products'
 
-import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button,
-InputLabel, MenuItem, Select, FormHelperText
-} from '@mui/material'
+import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button } from '@mui/material'
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -22,35 +20,23 @@ const fileTypes = [
     "image/x-icon"
 ];
 
-const EditCategory = ({ handleClose, category }) => {
+const CreateLoyaltyProductVariation = ({ product_id, handleClose }) => {
 
     const [ loading, setLoading ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const [ values, setValues ] = useState({
-        name: '', device_type: '',  image_url: ''
+        name: '', price: '',  image_url: '', color: ''
     })
     const [ errors, setErrors ] = useState({
-        name: '', device_type: '', image_url: ''
+        name: '', price: '', image_url: '', color: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
-    const [ oldImageName, setOldImageName ] = useState('')
-    const [ isImageChange, setIsImageChange ] = useState(false)
 
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
     };
-
-    useEffect(() => {
-        if(category) {
-            setValues({ name: category.product_category_name, device_type: category.device_type, image_url: category.product_category_image_url })
-            setImagePreview(category.product_category_image_url)
-            let image_url = category.product_category_image_url
-            setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [category])
 
     const [ getImageUrl ] = useMutation(GET_IMAGE_UPLOAD_URL, {
         onError: (error) => {
@@ -62,25 +48,25 @@ const EditCategory = ({ handleClose, category }) => {
         },
         onCompleted: (result) => {
             setImageFileUrl(result.getImageUploadUrl.imageUploadUrl)
-            setIsImageChange(true)
             setValues({ ...values, image_url: `https://axra.sgp1.digitaloceanspaces.com/VJun/${result.getImageUploadUrl.imageName}` })
         },
     })
 
-    const [ updateCategory ] = useMutation(UPDATE_CATEGORY, {
+    const [ createProductVariation ] = useMutation(CREATE_VARIATION, {
         onError: (error) => {
             console.log('error : ', error)
             setShowAlert({ message: 'Error on server', isError: true })
             setTimeout(() => {
                 setShowAlert({ message: '', isError: false })
             }, 1000)
-            setLoading(false)
         },
         onCompleted: () => {
-            setErrors({ name: '', device_type: '',  image_url: '' })
+            setValues({ name: '', price: '', image_url: '', color: '' })
+            setErrors({ name: '', price: '', image_url: '', color: '' })
             setImageFile('')
+            setImagePreview('')
             setLoading(false)
-            setShowAlert({ message: 'Category have been updated.', isError: false })
+            setShowAlert({ message: 'Product variation have been created.', isError: false })
             setTimeout(() => {
                 setShowAlert({ message: '', isError: false })
             }, 1000)
@@ -104,20 +90,28 @@ const EditCategory = ({ handleClose, category }) => {
         }
     }
 
-    const handleUpdate = async () => {
+    const handleCreate = async () => {
         setLoading(true)
-        setErrors({name: '', device_type: '',  image_url: ''})
+        setErrors({name: '', price: '',  image_url: '', color: ''})
         let isErrorExit = false
         let errorObject = {}
         if(!values.name) {
             errorObject.name = 'Name field is required.'
             isErrorExit = true
         }
-        if(!values.device_type) {
-            errorObject.price = 'Device Type field is required.'
+        if(!values.price) {
+            errorObject.price = 'Point Price field is required.'
             isErrorExit = true
         }
-        if(!values.image_url) {
+        if(values.price && isNaN(+values.price)) {
+            errorObject.price = 'Price filed accepts only numeric number.'
+            isErrorExit = true
+        }
+        if(!values.color) {
+            errorObject.color = 'Color field is required.'
+            isErrorExit = true
+        }
+        if(!values.image_url || !imageFile) {
             errorObject.image_url = 'Image field is required.'
             isErrorExit = true
         }
@@ -127,10 +121,8 @@ const EditCategory = ({ handleClose, category }) => {
             return
         }
         try {
-            if(isImageChange) {
-                await imageService.uploadImage(imageFileUrl, imageFile)
-            }
-            updateCategory({variables: { ...values, image_name: oldImageName, id: category.id }})
+            await product.uploadImage(imageFileUrl, imageFile)
+            createProductVariation({variables: { ...values, product_id: product_id }})
         } catch (error) {
             console.log('error : ', error)
         }
@@ -139,26 +131,18 @@ const EditCategory = ({ handleClose, category }) => {
     return (
         <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
-                <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Edit Category</Typography>
+                <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Loyalty Product Variation</Typography>
                 <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
                 <CardMedia
                     component="img"
                     image={imagePreview}
-                    alt="Category Photo"
+                    alt="Product"
                     sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
                 />
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
-                        <FormControl sx={{ m: 2 }}>
-                            <TextField id="image" placeholder="Upload image" InputLabelProps={{ shrink: true }} label="Upload Image"
-                                onChange={imageChange}
-                                error={errors.image_url? true: false}
-                                helperText={errors.image_url}
-                                type="file" accept="image/png, image/jpeg, image/jpg, image/gif, image/svg+xml"
-                            />
-                        </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
                             <TextField id="name" label="Name"
                                 value={values.name}
@@ -168,30 +152,37 @@ const EditCategory = ({ handleClose, category }) => {
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="device_type">Device Type</InputLabel>
-                          <Select
-                            labelId="device_type"
-                            value={values.device_type}
-                            label="Device Type"
-                            onChange={handleChange('device_type')}
-                            error={errors.device_type? true:false}
-                          >
-                            <MenuItem value='All' >All</MenuItem>
-                            <MenuItem value='IOS' >IOS</MenuItem>
-                            <MenuItem value='Android' >Android</MenuItem>
-                          </Select>
-                          {
-                            errors.device_type && <FormHelperText error >{errors.device_type}</FormHelperText>
-                          }
+                            <TextField id="price" label="Point Price"
+                                value={values.price}
+                                onChange={handleChange('price')}
+                                error={errors.price? true: false}
+                                helperText={errors.price}
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }} variant="outlined">
+                            <TextField id="color" label="Color"
+                                value={values.color}
+                                onChange={handleChange('color')}
+                                error={errors.color? true: false}
+                                helperText={errors.color}
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }}>
+                            <TextField id="image" placeholder="Upload image" InputLabelProps={{ shrink: true }} label="Upload Image"
+                                onChange={imageChange}
+                                error={errors.image_url? true: false}
+                                helperText={errors.image_url}
+                                type="file" accept="image/png, image/jpeg, image/jpg, image/gif, image/svg+xml"
+                            />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
                             <LoadingButton
                                 variant="contained"
                                 loading={loading}
-                                onClick={handleUpdate}
+                                onClick={handleCreate}
                                 sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
                             >
-                                Update
+                                Create
                             </LoadingButton>
                         </FormControl>
                     </Box>
@@ -207,4 +198,4 @@ const EditCategory = ({ handleClose, category }) => {
     )
 }
 
-export default EditCategory
+export default CreateLoyaltyProductVariation

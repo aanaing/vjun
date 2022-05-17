@@ -8,7 +8,7 @@ import {
 import { useLazyQuery } from '@apollo/client'
 import { PRODUCTS } from '../../gql/loyalty_products'
 
-import CreateProduct from "../../components/products/CreateProduct"
+import CreateProduct from "../../components/LoyaltyProducts/CreateLoyaltyProduct"
 
 const style = {
   position: 'absolute',
@@ -47,8 +47,8 @@ const Index = () => {
 
   useEffect(() => {
     if( result.data) {
-      setProducts(result.data.loyality_products)
-      setCount(Number(result.data?.loyality_products_aggregate.aggregate.count))
+      setProducts(result.data.loyalty_products)
+      setCount(Number(result.data?.loyalty_products_aggregate.aggregate.count))
     }
   }, [result])
 
@@ -87,7 +87,7 @@ const Index = () => {
       </Breadcrumbs>
     </div>
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} >
-      <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'New Variation'}</Button>
+      <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'New Product'}</Button>
       <FormControl sx={{ width: 300 }} >
         <TextField id="outlined-search" label="Search by Name" type="search" 
           value={search}
@@ -129,7 +129,7 @@ const Index = () => {
           Point Price
         </TableCell>
         <TableCell style={{ minWidth: 70 }}>
-          Claimed Amount
+          Amount Left
         </TableCell>
         <TableCell style={{ minWidth: 70 }}>
           Expired Date
@@ -172,7 +172,7 @@ const Index = () => {
               {row.point_price}
             </TableCell>
             <TableCell >
-              {row.claimed_amount}
+              {row.amount_left}
             </TableCell>
             <TableCell >
               {row.expiry_date}

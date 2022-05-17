@@ -10,3 +10,22 @@ export const GET_IMAGE_UPLOAD_URL = gql`
         }
     }  
 `
+
+export const CATEGORIES = gql`
+query Categories {
+    product_categories {
+        id
+        product_category_name
+    }
+}
+`
+
+export const BRANDS = gql`
+query brands {
+    brand_name {
+      id
+      name
+    }
+  }
+  
+`

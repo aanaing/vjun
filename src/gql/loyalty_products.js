@@ -2,8 +2,8 @@ import { gql } from '@apollo/client'
 
 export const PRODUCTS = gql`
 query Products ($limit: Int!, $offset: Int!, $search: String) {
-    loyality_products(limit: $limit, offset: $offset, where: {name: {_ilike: $search}}, order_by: {created_at: desc}) {
-      claimed_amount
+    loyalty_products(limit: $limit, offset: $offset, where: {name: {_ilike: $search}}, order_by: {created_at: desc}) {
+      amount_left
       created_at
       description
       expiry_date
@@ -16,7 +16,7 @@ query Products ($limit: Int!, $offset: Int!, $search: String) {
       product_image_url
       updated_at
     }
-    loyality_products_aggregate(where: {name: {_ilike: $search}}) {
+    loyalty_products_aggregate(where: {name: {_ilike: $search}}) {
         aggregate {
           count
         }
@@ -26,11 +26,11 @@ query Products ($limit: Int!, $offset: Int!, $search: String) {
 
 export const PRODUCT = gql`
 query Product($id: uuid!) {
-    loyality_products_by_pk (id: $id) {
+    loyalty_products_by_pk (id: $id) {
       brand_name {
         name
       }
-      claimed_amount
+      amount_left
       created_at
       description
       expiry_date
@@ -42,16 +42,41 @@ query Product($id: uuid!) {
       }
       product_image_url
       updated_at
-      loyalty_products_variations {
-        claimed_amount
-        color
-        created_at
-        id
-        point_price
-        updated_at
-        variation_image_url
-        variation_name
-      }
     }
   }
 `
+
+export const CREATE = gql`
+mutation Insert_Loyalty_Product ($description: String, $date: date, $brand_id: uuid, $category_id: uuid, $name: String, $price: Int, $image_url: String) {
+  insert_loyalty_products_one(object: { description: $description, expiry_date: $date, fk_brand_id: $brand_id, fk_product_category_id: $category_id, name: $name, point_price: $price, product_image_url: $image_url}) {
+    amount_left
+    created_at
+    description
+    expiry_date
+    id
+    name
+    point_price
+    product_category {
+      product_category_name
+    }
+    product_image_url
+    updated_at
+  }
+}
+`
+
+export const CREATE_VARIATION = gql`
+mutation Insert_Loyalty_Product_Variation ($color: String!, $product_id: uuid!, $price: Int, $image_url: String!, $name: String!) {
+  insert_loyalty_products_variations_one(object: {color: $color, fk_product_id: $product_id, point_price: $price, variation_image_url: $image_url, variation_name: $name}) {
+    amount_left
+    color
+    created_at
+    id
+    point_price
+    updated_at
+    variation_image_url
+    variation_name
+  }
+}
+`
+

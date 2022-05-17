@@ -32,12 +32,17 @@ query Products_by_pk($id: uuid!) {
       category {
         product_category_name
       }
+      fk_product_category_id
+      fk_brand_id
       created_at
       description
       id
       name
       price
       product_image_url
+      show_reviews
+      discount_eligible
+      sold_amount
       product_variations {
         color
         created_at
@@ -85,8 +90,8 @@ export const PRODUCT_VARIATIONS_BY_PK = gql`
 `
 
 export const CREATE_PRODUCT = gql`
-    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $description: String!, $category: uuid!) {
-        insert_products_one(object: {description: $description, name: $name, price: $price, product_image_url: $product_image_url, fk_product_category_id: $category }) {
+    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $description: String!, $category: uuid!, $brand: uuid!) {
+        insert_products_one(object: {description: $description, name: $name, price: $price, product_image_url: $product_image_url, fk_product_category_id: $category, fk_brand_id: $brand }) {
             created_at
             description
             id
@@ -94,6 +99,9 @@ export const CREATE_PRODUCT = gql`
             price
             product_image_url
             updated_at
+            brand_name {
+                name
+            }
         }
     }
 `
@@ -136,11 +144,23 @@ mutation Delete_Products_by_pk($id: uuid!, $image_name: String!) {
 }
 `
 
-export const CATEGORIES = gql`
-query Categories {
-    product_categories {
+export const UPDATE_PRODUCT = gql`
+mutation Update_Product_By_Id ($id: uuid!, $description: String, $discount: Boolean, $brand: uuid, $category: uuid, $name: String, $price: numeric, $product_image_url: String, $review: Boolean, $image_name: String!) {
+    update_products_by_pk(pk_columns: {id: $id}, _set: {description: $description, discount_eligible: $discount, fk_brand_id: $brand, fk_product_category_id: $category, name: $name, price: $price, product_image_url: $product_image_url, show_reviews: $review }) {
+        created_at
+        description
         id
-        product_category_name
+        name
+        price
+        product_image_url
+        updated_at
+        brand_name {
+            name
+        }
     }
-}
+    deleteImage(imageName: $image_name) {
+      error
+      message
+    }
+  }  
 `

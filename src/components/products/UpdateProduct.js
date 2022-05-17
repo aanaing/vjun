@@ -1,8 +1,8 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS } from '../../gql/misc'
-import { CREATE_PRODUCT } from '../../gql/products'
+import { UPDATE_PRODUCT } from '../../gql/products'
 
 import { Box, Card, CardContent, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
     Button
@@ -22,19 +22,21 @@ const fileTypes = [
     "image/x-icon"
 ];
 
-const CreateProduct = (props) => {
+const UpdateProduct = (props) => {
 
     const [ loading, setLoading ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const [ values, setValues ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: ''
     })
     const [ errors, setErrors ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
+    const [ oldImageName, setOldImageName ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
+    const [ isImageChange, setIsImageChange ] = useState(false)
 
     const category_result = useQuery(CATEGORIES)
     const brand_result = useQuery(BRANDS)
@@ -53,24 +55,12 @@ const CreateProduct = (props) => {
         },
         onCompleted: (result) => {
             setImageFileUrl(result.getImageUploadUrl.imageUploadUrl)
+            setIsImageChange(true)
             setValues({ ...values, product_image_url: `https://axra.sgp1.digitaloceanspaces.com/VJun/${result.getImageUploadUrl.imageName}` })
         },
     })
 
-    // const updateCache = (cache, {data}) => {
-    //     const existingProducts = cache.readQuery({
-    //         query: PRODUCTS,
-    //         variables: { limit: props.limit, offset: props.offset }
-    //     })
-    //     console.log(existingProducts)
-    //     const newProducts = data.insert_products_one
-    //     cache.writeQuery({
-    //         query: PRODUCTS,
-    //         data: { products: [ newProducts, ...existingProducts.products ], products_aggregate: existingProducts.products_aggregate }
-    //     })
-    // }
-
-    const [ createProduct ] = useMutation(CREATE_PRODUCT, {
+    const [ updateProduct ] = useMutation(UPDATE_PRODUCT, {
         onError: (error) => {
             console.log('error : ', error)
             setShowAlert({ message: 'Error on server', isError: true })
@@ -80,18 +70,27 @@ const CreateProduct = (props) => {
             setLoading(false)
         },
         onCompleted: () => {
-            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
-            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
+            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
+            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
             setImageFile('')
             setImagePreview('')
             setLoading(false)
-            setShowAlert({ message: 'Product have been created.', isError: false })
-            setTimeout(() => {
-                setShowAlert({ message: '', isError: false })
-            }, 1000)
+            // setShowAlert({ message: 'Product have been updated.', isError: false })
+            // setTimeout(() => {
+            //     setShowAlert({ message: '', isError: false })
+            // }, 1000)
+            props.productAlert('Product have been updated.', false)
+            props.handleClose()
         },
-        // update: updateCache
     })
+
+    useEffect(() => {
+        let product = props.product
+        setValues({ name: product.name, price: product.price, description: product.description, category: product.fk_product_category_id, brand: product.fk_brand_id, product_image_url: product.product_image_url, discount: product.discount_eligible, review: product.show_reviews })
+        setImagePreview(product.product_image_url)
+        let image_url = product.product_image_url
+        setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
+    }, [props.product])
 
     const imageChange = async (e) => {
         if(e.target.files && e.target.files[0]) {
@@ -110,9 +109,9 @@ const CreateProduct = (props) => {
         }
     }
 
-    const handleCreate = async () => {
+    const handleUpdate = async () => {
         setLoading(true)
-        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
+        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
         let isErrorExit = false
         let errorObject = {}
         if(!values.name) {
@@ -131,7 +130,7 @@ const CreateProduct = (props) => {
             errorObject.description = 'Description field is required.'
             isErrorExit = true
         }
-        if(!values.product_image_url || !imageFile) {
+        if(!values.product_image_url) {
             errorObject.product_image_url = 'Image field is required.'
             isErrorExit = true
         }
@@ -149,8 +148,10 @@ const CreateProduct = (props) => {
             return
         }
         try {
-            await product.uploadImage(imageFileUrl, imageFile)
-            createProduct({variables: { ...values }})
+            if(isImageChange) {
+                await product.uploadImage(imageFileUrl, imageFile)
+            }
+            updateProduct({variables: { ...values, image_name: oldImageName, id: props.product_id }})
         } catch (error) {
             console.log('error : ', error)
         }
@@ -167,7 +168,7 @@ const CreateProduct = (props) => {
     return (
         <div style={{ position: 'relative' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
-            <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Product</Typography>
+            <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Update Product</Typography>
             <Button onClick={props.handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
         </Box>
         <Box
@@ -263,13 +264,45 @@ const CreateProduct = (props) => {
                           }
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
+                          <InputLabel id="discount">Discount Eligible</InputLabel>
+                          <Select
+                            labelId="discount"
+                            value={values.discount}
+                            label="Discount Eligible"
+                            onChange={handleChange('discount')}
+                            error={errors.discount? true:false}
+                          >
+                            <MenuItem value={false} >False</MenuItem>
+                            <MenuItem selected value={true} >True</MenuItem>
+                          </Select>
+                          {
+                            errors.discount && <FormHelperText error >{errors.discount}</FormHelperText>
+                          }
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }} variant="outlined">
+                          <InputLabel id="review">Show Review</InputLabel>
+                          <Select
+                            labelId="review"
+                            value={values.review}
+                            label="Show Review"
+                            onChange={handleChange('review')}
+                            error={errors.review? true:false}
+                          >
+                            <MenuItem value={false} >False</MenuItem>
+                            <MenuItem selected value={true} >True</MenuItem>
+                          </Select>
+                          {
+                            errors.review && <FormHelperText error >{errors.review}</FormHelperText>
+                          }
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }} variant="outlined">
                             <LoadingButton
                                 variant="contained"
                                 loading={loading}
-                                onClick={handleCreate}
+                                onClick={handleUpdate}
                                 sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
                             >
-                                Create
+                                Update
                             </LoadingButton>
                         </FormControl>
                     </Box>
@@ -286,4 +319,4 @@ const CreateProduct = (props) => {
     )
 }
 
-export default CreateProduct
+export default UpdateProduct

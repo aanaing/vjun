@@ -8,6 +8,8 @@ import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, Car
 } from '@mui/material'
 import ProductVariationTable from '../../components/products/ProductVariationTable'
 import CreateProductVariation from "../../components/products/CreateProductVariation"
+import UpdateProduct from "../../components/products/UpdateProduct"
+import Reviews from '../../components/products/Reviews'
 
 const style = {
   position: 'absolute',
@@ -15,7 +17,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '100vw',
-  height: '100vh',
+  minHeight: '100vh',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -41,9 +43,17 @@ const Product = ({ homeAlert }) => {
     const { id } = useParams()
 
     const result = useQuery(PRODUCT_BY_ID, { variables: {id: id} })
-    const [open, setOpen] = useState(false);
+    const [ open, setOpen ] = useState(false);
     const [ openP, setOpenP ] = useState(false)
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
+    const [ openU, setOpenU ] = useState(false)
+    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
+
+    const productAlert = (message, isError = false) => {
+      setShowAlert({ message: message, isError: isError})
+      setTimeout(() => {
+        setShowAlert({ message: '', isError: false })
+      }, 3000)
+    }
 
     const handleOpenP = () => {
       result.refetch()
@@ -54,6 +64,11 @@ const Product = ({ homeAlert }) => {
     const handleClose = () => {
       result.refetch()
       setOpen(false)
+    };
+    const handleOpenU = () => setOpenU(true);
+    const handleCloseU = () => {
+      result.refetch()
+      setOpenU(false)
     };
 
     const [ deleteProduct ] = useMutation(DELETE_PRODUCT, {
@@ -159,8 +174,32 @@ const Product = ({ homeAlert }) => {
                                   secondary={product.description}
                                 />
                               </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Brand"
+                                  secondary={product.brand_name?.name}
+                                />
+                              </ListItem>
                             </Box>
                             <Box>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Reviews"
+                                  secondary={product.show_reviews? 'Show' : 'Not show'}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Discount"
+                                  secondary={product.discount_eligible? 'eligible' : 'ineligible'}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Sold Amount"
+                                  secondary={product.sold_amount}
+                                />
+                              </ListItem>
                               <ListItem>
                                 <ListItemText
                                   primary="Category"
@@ -183,7 +222,7 @@ const Product = ({ homeAlert }) => {
                           </Paper>
                       </CardContent>
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
-                        <Button size="small" color="primary">
+                        <Button onClick={handleOpenU} size="small" color="primary">
                           Edit
                         </Button>
                         <Button size="small" color="error" onClick={handleOpenP}>
@@ -225,7 +264,20 @@ const Product = ({ homeAlert }) => {
                   </Box>
                 </Modal>
               </div>
+              <div style={{ minHeight: 'auto' }}>
+                <Modal
+                  open={openU}
+                  onClose={handleCloseU}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <UpdateProduct productAlert={productAlert} product_id={product.id} product={{ ...product, product_variations: undefined, brand_name: undefined, category: undefined }} handleClose={handleCloseU} />
+                  </Box>
+                </Modal>
+              </div>
               <ProductVariationTable variationsProp={product?.product_variations} />
+              <Reviews productAlert={productAlert} product_id={product?.id} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

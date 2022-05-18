@@ -217,8 +217,8 @@ const User = () => {
                               label="Change Member Tier"
                               onChange={updateMemberTire}
                             >
-                              <MenuItem value='' >Null</MenuItem>
-                              <MenuItem value="Member" >Member</MenuItem>
+                              <MenuItem value='' >NORMAL USER</MenuItem>
+                              <MenuItem value="MEMBER" >Member</MenuItem>
                               <MenuItem value="VIP" >VIP</MenuItem>
                             </Select>
                           </FormControl>

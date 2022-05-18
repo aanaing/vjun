@@ -164,3 +164,21 @@ mutation Update_Product_By_Id ($id: uuid!, $description: String, $discount: Bool
     }
   }  
 `
+
+export const UPDATE_PRODUCT_VARIATION = gql`
+mutation Update_Product_Variation_By_Id($id: uuid!, $image_name: String!, $color: String, $price: numeric, $image_url: String, $name: String) {
+    update_product_variations_by_pk(pk_columns: {id: $id}, _set: {color: $color, price: $price, variation_image_url: $image_url, variation_name: $name}) {
+        created_at
+        fk_product_id
+        id
+        price
+        updated_at
+        variation_image_url
+        variation_name
+    }
+    deleteImage(imageName: $image_name) {
+        error
+        message
+    }
+  }  
+`

@@ -42,6 +42,8 @@ query Product($id: uuid!) {
       }
       product_image_url
       updated_at
+      fk_product_category_id
+      fk_brand_id
     }
   }
 `
@@ -61,6 +63,8 @@ mutation Insert_Loyalty_Product ($description: String, $date: date, $brand_id: u
     }
     product_image_url
     updated_at
+    fk_product_category_id
+    fk_brand_id
   }
 }
 `
@@ -76,6 +80,36 @@ mutation Insert_Loyalty_Product_Variation ($color: String!, $product_id: uuid!, 
     updated_at
     variation_image_url
     variation_name
+    fk_product_category_id
+    fk_brand_id
+  }
+}
+`
+
+export const UPDATE = gql`
+mutation Update_Loyalty_Products_By_Pk($id: uuid!, $amount_left: Int!, $description: String, $date: date, $brand_id: uuid, $category_id: uuid, $name: String, $price: Int, $image_url: String, $image_name: String! ) {
+  update_loyalty_products_by_pk(pk_columns: {id: $id}, _set: {amount_left: $amount_left, description: $description, expiry_date: $date, fk_brand_id: $brand_id, fk_product_category_id: $category_id, name: $name, point_price: $price, product_image_url: $image_url}) {
+    brand_name {
+      name
+    }
+    amount_left
+    created_at
+    description
+    expiry_date
+    id
+    point_price
+    name
+    product_category {
+      product_category_name
+    }
+    product_image_url
+    updated_at
+    fk_product_category_id
+    fk_brand_id
+  }
+  deleteImage(imageName: $image_name) {
+    error
+    message
   }
 }
 `

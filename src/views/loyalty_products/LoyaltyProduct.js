@@ -1,7 +1,8 @@
 import React, { useState } from "react"
-import { Link, useParams, useNavigate } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import { PRODUCT } from '../../gql/loyalty_products'
+import UpdateLoyaltyProduct from "../../components/LoyaltyProducts/UpdateLoyaltyProduct"
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
   CardActions, Button, Modal, Alert
@@ -19,14 +20,27 @@ const styleP = {
   p: 4,
 };
 
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '100vw',
+  maxHeight: '100vh',
+  overflow: 'scroll',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const LoyaltyProduct = ({ homeAlert }) => {
 
-    const navigate = useNavigate()
     const { id } = useParams()
 
     const result = useQuery(PRODUCT, { variables: {id: id} })
     const [ openP, setOpenP ] = useState(false)
+    const [ open, setOpen ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
 
     const handleOpenP = () => {
@@ -34,6 +48,11 @@ const LoyaltyProduct = ({ homeAlert }) => {
       setOpenP(true)
     }
     const handleCloseP = () => setOpenP(false)
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => {
+      result.refetch()
+      setOpen(false)
+    };
 
     if(result.loading) {
       return (
@@ -44,6 +63,13 @@ const LoyaltyProduct = ({ homeAlert }) => {
     }
 
     const product = result.data.loyalty_products_by_pk
+
+    const productAlert = (message, isError = false) => {
+      setShowAlert({ message: message, isError: isError})
+      setTimeout(() => {
+        setShowAlert({ message: '', isError: false })
+      }, 3000)
+    }
 
     return (
         <div>
@@ -152,7 +178,7 @@ const LoyaltyProduct = ({ homeAlert }) => {
                           </Paper>
                       </CardContent>
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
-                        <Button size="small" color="primary">
+                        <Button size="small" color="primary" onClick={handleOpen}>
                           Edit
                         </Button>
                         <Button size="small" color="error" onClick={handleOpenP}>
@@ -181,6 +207,18 @@ const LoyaltyProduct = ({ homeAlert }) => {
                       </Box>
                   </Modal>
               </Paper>
+              <div style={{ minHeight: 'auto' }}>
+                <Modal
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+                >
+                  <Box sx={style}>
+                    <UpdateLoyaltyProduct productAlert={productAlert} product_id={product.id} product={product} handleClose={handleClose} />
+                  </Box>
+                </Modal>
+              </div>
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

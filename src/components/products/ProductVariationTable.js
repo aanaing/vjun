@@ -12,6 +12,8 @@ import { Button, Alert, Modal, Box, Typography } from '@mui/material'
 import { useMutation } from '@apollo/client'
 import { DELETE_PRODUCT_VARIATION, PRODUCT_VARIATIONS } from '../../gql/products'
 
+import UpdateProcutVariation from './UpdateProductVariation'
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -24,11 +26,27 @@ const style = {
   p: 4,
 };
 
+const styleU = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '100vw',
+  maxHeight: '100vh',
+  overflow: 'scroll',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
 export default function ProductVariationTable({ variationsProp }) {
   const [ variations, setVariations ] = useState(null)
   const [ showAlert, setShowAlert ] = React.useState({ message: '', isError: false });
   const [ id, setId ] = useState('')
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false)
+  const [ openU, setOpenU ] = useState(false)
+  const [ variation, setVariation ] = useState(null)
 
   useEffect(() => {
     setVariations(variationsProp)
@@ -67,6 +85,21 @@ export default function ProductVariationTable({ variationsProp }) {
     let image_name = image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght )
     deleteVariation({ variables: {id: id, image_name: image_name} })
     handleClose()
+  }
+
+  const handleOpenU = (data) => {
+    setVariation(data)
+    setOpenU(true)
+  };
+  const handleCloseU = () => {
+    setOpenU(false)
+  };
+
+  const variationAlert = (message, isError = false) => {
+    setShowAlert({ message: message, isError: isError})
+    setTimeout(() => {
+      setShowAlert({ message: '', isError: false })
+    }, 3000)
   }
 
   return (
@@ -161,7 +194,7 @@ export default function ProductVariationTable({ variationsProp }) {
                       {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                      <Button color="primary">Edit</Button>
+                      <Button color="primary" onClick={ () => handleOpenU(row) } >Edit</Button>
                       <Button color="error" onClick={() => handleOpen(row.id)}>Remove</Button>
                     </TableCell>
                   </TableRow>
@@ -190,6 +223,18 @@ export default function ProductVariationTable({ variationsProp }) {
           </Box>
         </Box>
       </Modal>
+      <div style={{ minHeight: 'auto' }}>
+        <Modal
+          open={openU}
+          onClose={handleCloseU}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={styleU}>
+            <UpdateProcutVariation product_id={variation?.id} handleClose={handleCloseU} product={variation} variationAlert={variationAlert} />
+          </Box>
+        </Modal>
+      </div>
       {
         (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
       }

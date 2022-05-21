@@ -3,6 +3,7 @@ import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS } from '../../gql/misc'
 import { CREATE_PRODUCT } from '../../gql/products'
+import RichTextEditor from 'react-rte'
 
 import { Box, Card, CardContent, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
     Button
@@ -27,14 +28,16 @@ const CreateProduct = (props) => {
     const [ loading, setLoading ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const [ values, setValues ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', barcode: ''
     })
     const [ errors, setErrors ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', barcode: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
+
+    const [ textValue, setTextValue ] = useState(RichTextEditor.createEmptyValue())
 
     const category_result = useQuery(CATEGORIES)
     const brand_result = useQuery(BRANDS)
@@ -80,8 +83,9 @@ const CreateProduct = (props) => {
             setLoading(false)
         },
         onCompleted: () => {
-            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
-            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
+            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', barcode: ''})
+            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', barcode: ''})
+            setTextValue(RichTextEditor.createEmptyValue())
             setImageFile('')
             setImagePreview('')
             setLoading(false)
@@ -112,7 +116,7 @@ const CreateProduct = (props) => {
 
     const handleCreate = async () => {
         setLoading(true)
-        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: ''})
+        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', barcode: ''})
         let isErrorExit = false
         let errorObject = {}
         if(!values.name) {
@@ -164,6 +168,31 @@ const CreateProduct = (props) => {
         )
     }
 
+    const onChange = (value) => {
+        setTextValue(value)
+       setValues({ ...values, description: value.toString('html') })
+    }
+
+    const toolbarConfig = {
+        // Optionally specify the groups to display (displayed in the order listed).
+        display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
+        INLINE_STYLE_BUTTONS: [
+          {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
+          {label: 'Italic', style: 'ITALIC'},
+          {label: 'Underline', style: 'UNDERLINE'}
+        ],
+        BLOCK_TYPE_DROPDOWN: [
+          {label: 'Normal', style: 'unstyled'},
+          {label: 'Heading Large', style: 'header-one'},
+          {label: 'Heading Medium', style: 'header-two'},
+          {label: 'Heading Small', style: 'header-three'}
+        ],
+        BLOCK_TYPE_BUTTONS: [
+          {label: 'UL', style: 'unordered-list-item'},
+          {label: 'OL', style: 'ordered-list-item'}
+        ]
+      };
+
     return (
         <div style={{ position: 'relative' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
@@ -181,14 +210,18 @@ const CreateProduct = (props) => {
             flexDirection: 'column'
             }}
         >
-            <Card sx={{ display: 'flex', justifyContent: 'center' }} >
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
-                <CardContent sx={{flex: 3}}>
+            <Card sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }} >
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
+                <CardContent sx={{flex: 2}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">
                             <TextField id="name" label="Name"
@@ -204,16 +237,6 @@ const CreateProduct = (props) => {
                                 onChange={handleChange('price')}
                                 error={errors.price? true: false}
                                 helperText={errors.price}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="description" label="Description"
-                                value={values.description}
-                                onChange={handleChange('description')}
-                                error={errors.description? true: false}
-                                helperText={errors.description}
-                                multiline
-                                rows={3}
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }}>
@@ -263,17 +286,33 @@ const CreateProduct = (props) => {
                           }
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                            <LoadingButton
-                                variant="contained"
-                                loading={loading}
-                                onClick={handleCreate}
-                                sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
-                            >
-                                Create
-                            </LoadingButton>
+                            <TextField id="barcode" label="Barcode"
+                                value={values.barcode}
+                                onChange={handleChange('barcode')}
+                                error={errors.barcode? true: false}
+                                helperText={errors.barcode}
+                            />
                         </FormControl>
                     </Box>
                 </CardContent>
+                <Box sx={{ my: 1 }}>
+                    <InputLabel>Description</InputLabel>
+                    <RichTextEditor style={{ height: '500px' }} value={textValue} onChange={onChange} toolbarConfig={toolbarConfig} />
+                    {
+                        errors.description && <FormHelperText error >{ errors.description }</FormHelperText>
+                    }
+                </Box>
+            </Box>
+                <FormControl sx={{ m: 2 }} variant="outlined">
+                    <LoadingButton
+                        variant="contained"
+                        loading={loading}
+                        onClick={handleCreate}
+                        sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
+                    >
+                        Create
+                    </LoadingButton>
+                </FormControl>
             </Card>
         </Box>
         {

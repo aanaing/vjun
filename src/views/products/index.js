@@ -16,6 +16,8 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '100vw',
+  maxHeight: '100vh',
+  overflow: 'scroll',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -121,9 +123,6 @@ const Index = () => {
               <TableCell style={{ minWidth: 70 }}>
                 Name
               </TableCell>
-              <TableCell style={{ minWidth: 170 }}>
-                Description
-              </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Price
               </TableCell>
@@ -157,9 +156,6 @@ const Index = () => {
                     </TableCell>
                     <TableCell >
                       {row.name}
-                    </TableCell>
-                    <TableCell >
-                      {row?.description.length > 25 ? row.description.substring(0, 24) + '...': row.description}
                     </TableCell>
                     <TableCell >
                       {row.price}
@@ -198,10 +194,6 @@ const Index = () => {
                 {row.description.substring(0, 20) + '...'}
               </Typography>
             </CardContent>
-            {/* <CardActions className="card-text">
-              <Button size="small">Share</Button>
-              <Button size="small" onClick={() => detailProdcut(row)}>Detail</Button>
-            </CardActions> */}
           </Card>
         ))
       }

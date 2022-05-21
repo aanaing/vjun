@@ -143,11 +143,11 @@ const Product = ({ homeAlert }) => {
                         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>Product</Typography>
                       </CardHeader>
                       <CardContent sx={{ display: 'flex' }}>
-                          <CardMedia sx={{ flex: 1 }}
-                              component="img"
-                              height="194"
-                              image={product.product_image_url}
-                              alt="Product"
+                          <CardMedia sx={{ flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
+                            component="img"
+                            height="194"
+                            image={product.product_image_url}
+                            alt="Product"
                           />
                           <Paper sx={{flex: 4, mx: 3, py: 2, display: 'flex', justifyContent: 'space-around' }}>
                             <Box>
@@ -171,14 +171,20 @@ const Product = ({ homeAlert }) => {
                               </ListItem>
                               <ListItem>
                                 <ListItemText
-                                  primary="Description"
-                                  secondary={product.description}
+                                  primary="Category"
+                                  secondary={product.category?.product_category_name}
                                 />
                               </ListItem>
                               <ListItem>
                                 <ListItemText
                                   primary="Brand"
                                   secondary={product.brand_name?.name}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Barcode"
+                                  secondary={product.barcode}
                                 />
                               </ListItem>
                             </Box>
@@ -203,12 +209,6 @@ const Product = ({ homeAlert }) => {
                               </ListItem>
                               <ListItem>
                                 <ListItemText
-                                  primary="Category"
-                                  secondary={product.fk_product_category}
-                                />
-                              </ListItem>
-                              <ListItem>
-                                <ListItemText
                                   primary="Created At"
                                   secondary={product.created_at}
                                 />
@@ -221,6 +221,12 @@ const Product = ({ homeAlert }) => {
                               </ListItem>
                             </Box>
                           </Paper>
+                      </CardContent>
+                      <CardContent>
+                        <Typography sx={{ fontSize: 16 }} color="text" gutterBottom>Description</Typography>
+                        <Paper sx={{ p: 2 }}>
+                          <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
+                        </Paper>
                       </CardContent>
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
                         <Button onClick={handleOpenU} size="small" color="primary">

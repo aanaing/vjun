@@ -1,7 +1,7 @@
 import React, { useState } from "react"
-import { Link, useParams } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
-import { PRODUCT } from '../../gql/loyalty_products'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { useQuery, useMutation } from '@apollo/client'
+import { PRODUCT, DELETE } from '../../gql/loyalty_products'
 import UpdateLoyaltyProduct from "../../components/LoyaltyProducts/UpdateLoyaltyProduct"
 
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
@@ -35,13 +35,27 @@ const style = {
 };
 
 const LoyaltyProduct = ({ homeAlert }) => {
-
+    const navigate = useNavigate()
     const { id } = useParams()
 
     const result = useQuery(PRODUCT, { variables: {id: id} })
     const [ openP, setOpenP ] = useState(false)
     const [ open, setOpen ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
+
+    const [ deleteProduct ] = useMutation(DELETE, {
+      onError: (error) => {
+        console.log('error : ', error)
+        setShowAlert({ message: 'Error on server', isError: true })
+        setTimeout(() => {
+          setShowAlert({ message: '', isError: false })
+        }, 3000)
+      },
+      onCompleted: () => {
+        homeAlert('Product have been removed.', false)
+        navigate('/loyalty_products')
+      },
+    })
 
     const handleOpenP = () => {
       result.refetch()
@@ -69,6 +83,12 @@ const LoyaltyProduct = ({ homeAlert }) => {
       setTimeout(() => {
         setShowAlert({ message: '', isError: false })
       }, 3000)
+    }
+
+    const handleDelete = () => {
+      let image_url = product.product_image_url
+      let image_name = image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght )
+      deleteProduct({ variables: {id: product.id, image_name: image_name} })
     }
 
     return (
@@ -104,7 +124,7 @@ const LoyaltyProduct = ({ homeAlert }) => {
                           <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>Product</Typography>
                       </CardHeader>
                       <CardContent sx={{ display: 'flex' }}>
-                          <CardMedia sx={{ flex: 1 }}
+                          <CardMedia sx={{ flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
                               component="img"
                               height="194"
                               image={product.product_image_url}
@@ -134,12 +154,6 @@ const LoyaltyProduct = ({ homeAlert }) => {
                                 <ListItemText
                                   primary="Brand"
                                   secondary={product.brand_name.name}
-                                />
-                              </ListItem>
-                              <ListItem>
-                                <ListItemText
-                                  primary="Description"
-                                  secondary={product.description}
                                 />
                               </ListItem>
                             </Box>
@@ -177,6 +191,12 @@ const LoyaltyProduct = ({ homeAlert }) => {
                             </Box>
                           </Paper>
                       </CardContent>
+                      <CardContent>
+                        <Typography sx={{ fontSize: 16 }} color="text" gutterBottom>Description</Typography>
+                        <Paper sx={{ p: 2 }}>
+                          <div dangerouslySetInnerHTML={{ __html: product.description }}></div>
+                        </Paper>
+                      </CardContent>
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
                         <Button size="small" color="primary" onClick={handleOpen}>
                           Edit
@@ -202,7 +222,7 @@ const LoyaltyProduct = ({ homeAlert }) => {
                         </Typography>
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                           <Button color='secondary' onClick={handleCloseP} >Cancel</Button>
-                          <Button >Confirm</Button>
+                          <Button onClick={handleDelete} >Confirm</Button>
                         </Box>
                       </Box>
                   </Modal>

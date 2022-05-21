@@ -87,7 +87,7 @@ mutation Insert_Loyalty_Product_Variation ($color: String!, $product_id: uuid!, 
 `
 
 export const UPDATE = gql`
-mutation Update_Loyalty_Products_By_Pk($id: uuid!, $amount_left: Int!, $description: String, $date: date, $brand_id: uuid, $category_id: uuid, $name: String, $price: Int, $image_url: String, $image_name: String! ) {
+mutation Update_Loyalty_Products_By_Id($id: uuid!, $amount_left: Int!, $description: String, $date: date, $brand_id: uuid, $category_id: uuid, $name: String, $price: Int, $image_url: String ) {
   update_loyalty_products_by_pk(pk_columns: {id: $id}, _set: {amount_left: $amount_left, description: $description, expiry_date: $date, fk_brand_id: $brand_id, fk_product_category_id: $category_id, name: $name, point_price: $price, product_image_url: $image_url}) {
     brand_name {
       name
@@ -107,10 +107,18 @@ mutation Update_Loyalty_Products_By_Pk($id: uuid!, $amount_left: Int!, $descript
     fk_product_category_id
     fk_brand_id
   }
+}
+`
+
+export const DELETE = gql`
+mutation Delete_Loyalty_product_Id($id: uuid!, $image_name: String!) {
+  delete_loyalty_products_by_pk(id: $id) {
+    id
+  }
   deleteImage(imageName: $image_name) {
     error
     message
   }
 }
-`
 
+`

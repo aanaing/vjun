@@ -19,6 +19,9 @@ const Users = lazy(() => import('./users/index'))
 const User = lazy(() => import('./users/User'))
 const LoyaltyProducts = lazy(() => import('./loyalty_products/index'))
 const LoyaltyProduct = lazy(() => import('./loyalty_products/LoyaltyProduct'))
+const Brands = lazy(() => import('./brands/index'))
+const Ads = lazy(() => import('./Ads/index'))
+const ServerConfig = lazy(() => import('./server_config/index'))
 
 const drawerWidth = 340;
 
@@ -102,7 +105,10 @@ useEffect(() => {
                 <Route path='/users' element={<Users />} />
                 <Route path='/user/:id' element={<User />} />
                 <Route path='/loyalty_products' element={<LoyaltyProducts />} />
-                <Route path='/loualty_product/:id' element={<LoyaltyProduct />} />
+                <Route path='/loualty_product/:id' element={<LoyaltyProduct homeAlert={homeAlert} />} />
+                <Route path='/brands' element={<Brands />} />
+                <Route path='/ads' element={<Ads />} />
+                <Route path='/server_config' element={ <ServerConfig /> } />
               </Routes>
             </AuthContext.Provider>
           </Suspense>

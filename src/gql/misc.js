@@ -8,7 +8,16 @@ export const GET_IMAGE_UPLOAD_URL = gql`
         imageUploadUrl
         message
         }
-    }  
+    }
+`
+
+export const DELETE_IMAGE = gql`
+mutation DeletImage ($image_name: String!) {
+    deleteImage(imageName: $image_name) {
+        error
+        message
+    }
+}
 `
 
 export const CATEGORIES = gql`

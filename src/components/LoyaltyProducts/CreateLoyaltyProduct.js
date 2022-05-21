@@ -3,6 +3,7 @@ import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS } from '../../gql/misc'
 import { CREATE } from '../../gql/loyalty_products'
+import RichTextEditor from 'react-rte'
 
 import { Box, Card, CardContent, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
     Button
@@ -35,6 +36,7 @@ const CreateLoyaltyProduct = (props) => {
     const [ errors, setErrors ] = useState({
         name: '', price: '', description: '', image_url: '', category_id: '', brand_id: '', date: ''
     })
+    const [ textValue, setTextValue ] = useState(RichTextEditor.createEmptyValue()) 
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
@@ -72,6 +74,7 @@ const CreateLoyaltyProduct = (props) => {
         onCompleted: () => {
             setValues({name: '', price: '', description: '', image_url: '', category_id: '', brand_id: '', date: new Date().toISOString()})
             setErrors({name: '', price: '', description: '', image_url: '', category_id: '', brand_id: '', date: ''})
+            setTextValue(RichTextEditor.createEmptyValue())
             setImageFile('')
             setImagePreview('')
             setLoading(false)
@@ -153,6 +156,31 @@ const CreateLoyaltyProduct = (props) => {
         )
     }
 
+    const onChange = (value) => {
+        setTextValue(value)
+       setValues({ ...values, description: value.toString('html') })
+    }
+
+    const toolbarConfig = {
+        // Optionally specify the groups to display (displayed in the order listed).
+        display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
+        INLINE_STYLE_BUTTONS: [
+          {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
+          {label: 'Italic', style: 'ITALIC'},
+          {label: 'Underline', style: 'UNDERLINE'}
+        ],
+        BLOCK_TYPE_DROPDOWN: [
+          {label: 'Normal', style: 'unstyled'},
+          {label: 'Heading Large', style: 'header-one'},
+          {label: 'Heading Medium', style: 'header-two'},
+          {label: 'Heading Small', style: 'header-three'}
+        ],
+        BLOCK_TYPE_BUTTONS: [
+          {label: 'UL', style: 'unordered-list-item'},
+          {label: 'OL', style: 'ordered-list-item'}
+        ]
+      };
+
     return (
         <div style={{ position: 'relative' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
@@ -170,14 +198,18 @@ const CreateLoyaltyProduct = (props) => {
             flexDirection: 'column'
             }}
         >
-            <Card sx={{ display: 'flex', justifyContent: 'center' }} >
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
-                <CardContent sx={{flex: 3}}>
+            <Card sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }} >
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
+                <CardContent sx={{flex: 2}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">
                             <TextField id="name" label="Name"
@@ -254,28 +286,26 @@ const CreateLoyaltyProduct = (props) => {
                                 />
                             </LocalizationProvider>
                         </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="description" label="Description"
-                                value={values.description}
-                                onChange={handleChange('description')}
-                                error={errors.description? true: false}
-                                helperText={errors.description}
-                                multiline
-                                rows={3}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <LoadingButton
-                                variant="contained"
-                                loading={loading}
-                                onClick={handleCreate}
-                                sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
-                            >
-                                Create
-                            </LoadingButton>
-                        </FormControl>
                     </Box>
                 </CardContent>
+                <Box sx={{ my: 1 }}>
+                    <InputLabel>Description</InputLabel>
+                    <RichTextEditor style={{ height: '500px' }} value={textValue} onChange={onChange} toolbarConfig={toolbarConfig} />
+                    {
+                        errors.description && <FormHelperText error >{ errors.description }</FormHelperText>
+                    }
+                </Box>
+            </Box>
+                <FormControl sx={{ m: 2 }} variant="outlined">
+                    <LoadingButton
+                        variant="contained"
+                        loading={loading}
+                        onClick={handleCreate}
+                        sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
+                    >
+                        Create
+                    </LoadingButton>
+                </FormControl>
             </Card>
         </Box>
         {

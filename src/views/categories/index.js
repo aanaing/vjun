@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Link } from 'react-router-dom'
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { CATEGORIES, DELETE_CATEGORY } from '../../gql/categories'
+import { CATEGORIES, DELETE_CATEGORY, UPDATE_POSITION } from '../../gql/categories'
 import { 
   Box, Breadcrumbs, Button, TableContainer, Table, TableHead, Avatar, Modal,
   TableBody, TableRow, TableCell, Alert, Typography
@@ -23,7 +23,7 @@ const style = {
   p: 4,
 };
 
-const styleM = {
+const styleD = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -63,6 +63,20 @@ const Index = () => {
     }
   })
 
+  const [ updateOpsition ] = useMutation(UPDATE_POSITION, {
+    onError: (error) => {
+      console.log('error: ', error)
+    },
+    onCompleted: (res) => {
+      setShowAlert({ message: `Category "${res?.update_product_categories_by_pk.product_category_name}" have been put to the top.`, isError: false })
+      setTimeout(() => {
+        setShowAlert({ message: '', isError: false })
+      }, 3000)
+      handleCloseD()
+    },
+    refetchQueries: [CATEGORIES]
+  })
+
   useEffect(() => {
     load()
   }, [load])
@@ -87,7 +101,7 @@ const Index = () => {
     result.refetch()
     setOpen(false)
   };
-  const handleOpenC = (row) => {
+  const handleOpenD = (row) => {
    setCategory(row)
     setOpenD(true)
   }
@@ -193,8 +207,9 @@ const Index = () => {
                       {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
+                      <Button color="secondary" onClick={() => updateOpsition({ variables: { id: row.id, updater: !row.updated_at_updater } })}>Put to Top</Button>
                       <Button color="primary" onClick={() => handleOpenE(row)}>Edit</Button>
-                      <Button color="error" onClick={() => handleOpenC(row)} >Remove</Button>
+                      <Button color="error" onClick={() => handleOpenD(row)} >Remove</Button>
                     </TableCell>
                     </TableRow>
                   ))
@@ -210,7 +225,7 @@ const Index = () => {
           aria-labelledby="keep-mounted-modal-title"
           aria-describedby="keep-mounted-modal-description"
         >
-          <Box sx={styleM}>
+          <Box sx={styleD}>
             <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
               Remove Category
             </Typography>

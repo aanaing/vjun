@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { useMutation } from '@apollo/client'
-import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
+import { GET_IMAGE_UPLOAD_URL, DELETE_IMAGE } from '../../gql/misc'
 import { UPDATE_PRODUCT_VARIATION } from '../../gql/products'
 import imageService from '../../services/image'
 
-import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button } from '@mui/material'
+import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button, InputLabel, MenuItem, Select, FormHelperText  } from '@mui/material'
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -39,6 +39,13 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
     };
+
+    const [ deleteImage ] = useMutation(DELETE_IMAGE, {
+        onError: (error) => {
+            console.log('error : ', error)
+            setLoading(false)
+        },
+    })
 
     const [ getImageUrl ] = useMutation(GET_IMAGE_UPLOAD_URL, {
         onError: (error) => {
@@ -75,7 +82,7 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
     })
 
     useEffect(() => {
-        setValues({ name: product.variation_name, price: product.price, image_url: product.variation_image_url, color: product.color })
+        setValues({ name: product.variation_name, price: product.price, image_url: product.variation_image_url, color: product.color??'' })
         setImagePreview(product.variation_image_url)
         let image_url = product.variation_image_url
         setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
@@ -131,8 +138,9 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
         try {
             if(isImageChange) {
                 await imageService.uploadImage(imageFileUrl, imageFile)
+                deleteImage({ variables: { image_name: oldImageName } })
             }
-            updateProductVariation({variables: { ...values, id: product_id, image_name: oldImageName }})
+            updateProductVariation({variables: { ...values, id: product_id }})
         } catch (error) {
             console.log('error : ', error)
         }
@@ -145,12 +153,15 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
                 <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
+                <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">
@@ -170,12 +181,20 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="color" label="Color"
-                                value={values.color}
-                                onChange={handleChange('color')}
-                                error={errors.color? true: false}
-                                helperText={errors.color}
-                            />
+                          <InputLabel id="color">Color</InputLabel>
+                          <Select
+                            labelId="review"
+                            value={values.color}
+                            label="Color"
+                            onChange={handleChange('color')}
+                            error={errors.color? true:false}
+                          >
+                            <MenuItem value='Red' >Red</MenuItem>
+                            <MenuItem value='Green' >Green</MenuItem>
+                          </Select>
+                          {
+                            errors.review && <FormHelperText error >{errors.review}</FormHelperText>
+                          }
                         </FormControl>
                         <FormControl sx={{ m: 2 }}>
                             <TextField id="image" placeholder="Upload image" InputLabelProps={{ shrink: true }} label="Upload Image"

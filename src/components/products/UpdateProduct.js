@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react"
 import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
-import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS } from '../../gql/misc'
+import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS, DELETE_IMAGE } from '../../gql/misc'
 import { UPDATE_PRODUCT } from '../../gql/products'
 
 import { Box, Card, CardContent, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
     Button
 } from '@mui/material'
 import { LoadingButton } from '@mui/lab';
+import RichTextEditor from 'react-rte'
 
 const fileTypes = [
     "image/apng",
@@ -27,16 +28,17 @@ const UpdateProduct = (props) => {
     const [ loading, setLoading ] = useState(false)
     const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const [ values, setValues ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '', barcode: ''
     })
     const [ errors, setErrors ] = useState({
-        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: ''
+        name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '', barcode: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ oldImageName, setOldImageName ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
     const [ isImageChange, setIsImageChange ] = useState(false)
+    const [ textValue, setTextValue ] = useState(RichTextEditor.createEmptyValue())
 
     const category_result = useQuery(CATEGORIES)
     const brand_result = useQuery(BRANDS)
@@ -44,6 +46,13 @@ const UpdateProduct = (props) => {
     const handleChange = (prop) => (event) => {
         setValues({ ...values, [prop]: event.target.value });
     };
+
+    const [ deleteImage ] = useMutation(DELETE_IMAGE, {
+        onError: (error) => {
+            console.log('error : ', error)
+            setLoading(false)
+        },
+    })
 
     const [ getImageUrl ] = useMutation(GET_IMAGE_UPLOAD_URL, {
         onError: (error) => {
@@ -70,15 +79,11 @@ const UpdateProduct = (props) => {
             setLoading(false)
         },
         onCompleted: () => {
-            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
-            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
+            setValues({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '', barcode: '' })
+            setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '', barcode: '' })
             setImageFile('')
             setImagePreview('')
             setLoading(false)
-            // setShowAlert({ message: 'Product have been updated.', isError: false })
-            // setTimeout(() => {
-            //     setShowAlert({ message: '', isError: false })
-            // }, 1000)
             props.productAlert('Product have been updated.', false)
             props.handleClose()
         },
@@ -86,7 +91,8 @@ const UpdateProduct = (props) => {
 
     useEffect(() => {
         let product = props.product
-        setValues({ name: product.name, price: product.price, description: product.description, category: product.fk_product_category_id, brand: product.fk_brand_id, product_image_url: product.product_image_url, discount: product.discount_eligible, review: product.show_reviews })
+        setValues({ name: product.name, price: product.price, barcode: product.barcode??'', description: product.description, category: product.fk_product_category_id, brand: product.fk_brand_id, product_image_url: product.product_image_url, discount: product.discount_eligible, review: product.show_reviews })
+        setTextValue(RichTextEditor.createValueFromString(product.description, 'html'))
         setImagePreview(product.product_image_url)
         let image_url = product.product_image_url
         setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
@@ -109,9 +115,29 @@ const UpdateProduct = (props) => {
         }
     }
 
+    const toolbarConfig = {
+        // Optionally specify the groups to display (displayed in the order listed).
+        display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
+        INLINE_STYLE_BUTTONS: [
+          {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
+          {label: 'Italic', style: 'ITALIC'},
+          {label: 'Underline', style: 'UNDERLINE'}
+        ],
+        BLOCK_TYPE_DROPDOWN: [
+          {label: 'Normal', style: 'unstyled'},
+          {label: 'Heading Large', style: 'header-one'},
+          {label: 'Heading Medium', style: 'header-two'},
+          {label: 'Heading Small', style: 'header-three'}
+        ],
+        BLOCK_TYPE_BUTTONS: [
+          {label: 'UL', style: 'unordered-list-item'},
+          {label: 'OL', style: 'ordered-list-item'}
+        ]
+      };
+
     const handleUpdate = async () => {
         setLoading(true)
-        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '' })
+        setErrors({name: '', price: '', description: '', product_image_url: '', category: '', brand: '', discount: '', review: '', barcode: '' })
         let isErrorExit = false
         let errorObject = {}
         if(!values.name) {
@@ -150,8 +176,9 @@ const UpdateProduct = (props) => {
         try {
             if(isImageChange) {
                 await product.uploadImage(imageFileUrl, imageFile)
+                deleteImage({ variables: { image_name: oldImageName } })
             }
-            updateProduct({variables: { ...values, image_name: oldImageName, id: props.product_id }})
+            updateProduct({variables: { ...values, id: props.product_id }})
         } catch (error) {
             console.log('error : ', error)
         }
@@ -163,6 +190,11 @@ const UpdateProduct = (props) => {
             <em>Loading...</em>
           </div>
         )
+    }
+
+    const onChange = (value) => {
+        setTextValue(value)
+       setValues({ ...values, description: value.toString('html') })
     }
 
     return (
@@ -182,13 +214,17 @@ const UpdateProduct = (props) => {
             flexDirection: 'column'
             }}
         >
-            <Card sx={{ display: 'flex', justifyContent: 'center' }} >
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
+            <Card sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }} >
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">
@@ -205,16 +241,6 @@ const UpdateProduct = (props) => {
                                 onChange={handleChange('price')}
                                 error={errors.price? true: false}
                                 helperText={errors.price}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="description" label="Description"
-                                value={values.description}
-                                onChange={handleChange('description')}
-                                error={errors.description? true: false}
-                                helperText={errors.description}
-                                multiline
-                                rows={3}
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }}>
@@ -296,17 +322,33 @@ const UpdateProduct = (props) => {
                           }
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                            <LoadingButton
-                                variant="contained"
-                                loading={loading}
-                                onClick={handleUpdate}
-                                sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
-                            >
-                                Update
-                            </LoadingButton>
+                            <TextField id="barcode" label="Barcode"
+                                value={values.barcode}
+                                onChange={handleChange('barcode')}
+                                error={errors.barcode? true: false}
+                                helperText={errors.barcode}
+                            />
                         </FormControl>
                     </Box>
                 </CardContent>
+                <Box sx={{ my: 1 }}>
+                    <InputLabel>Description</InputLabel>
+                    <RichTextEditor style={{ height: '500px' }} value={textValue} onChange={onChange} toolbarConfig={toolbarConfig} />
+                    {
+                        errors.description && <FormHelperText error >{ errors.description }</FormHelperText>
+                    }
+                </Box>
+            </Box>
+                <FormControl sx={{ m: 2 }} variant="outlined">
+                    <LoadingButton
+                        variant="contained"
+                        loading={loading}
+                        onClick={handleUpdate}
+                        sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
+                    >
+                        Update
+                    </LoadingButton>
+                </FormControl>
             </Card>
         </Box>
         {

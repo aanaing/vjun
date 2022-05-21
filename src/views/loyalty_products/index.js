@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link, useNavigate } from 'react-router-dom'
 import { 
-  Box, Breadcrumbs, Typography, Card, CardMedia, CardContent, Button, Modal, TablePagination, TableContainer, Table, TableHead,
+  Box, Breadcrumbs, Button, Modal, TablePagination, TableContainer, Table, TableHead,
   TableBody, TableRow, TableCell, TextField, FormControl, Avatar
 } from '@mui/material'
 
@@ -16,6 +16,8 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: '100vw',
+  maxHeight: '100vh',
+  overflow: 'scroll',
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
@@ -122,9 +124,6 @@ const Index = () => {
         <TableCell style={{ minWidth: 70 }}>
           Category
         </TableCell>
-        <TableCell style={{ minWidth: 170 }}>
-          Description
-        </TableCell>
         <TableCell style={{ minWidth: 70 }}>
           Point Price
         </TableCell>
@@ -164,9 +163,6 @@ const Index = () => {
             </TableCell>
             <TableCell >
               {row.product_category?.product_category_name}
-            </TableCell>
-            <TableCell >
-              {row?.description.length > 25 ? row.description.substring(0, 24) + '...': row.description}
             </TableCell>
             <TableCell >
               {row.point_price}

@@ -135,12 +135,15 @@ const CreateLoyaltyProductVariation = ({ product_id, handleClose }) => {
                 <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
+                <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">

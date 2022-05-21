@@ -42,6 +42,9 @@ query Order_By_Pk ($id: uuid!) {
         id
         order_status
         payment_screenshot_image_url
+        payment_receiver_account_number
+        payment_receiver_name
+        payment_service_name
         total_price
         total_quantity
         updated_at

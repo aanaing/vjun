@@ -92,6 +92,30 @@ const SideBar = ({ handleDrawerClose, open }) => {
                     Categories
                 </ListItem>
             </Link>
+            <Link to="/brands">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Brands
+                </ListItem>
+            </Link>
+            <Link to="/ads">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Ads
+                </ListItem>
+            </Link>
+            <Link to="/server_config">
+                <ListItem button>
+                    <ListItemIcon>
+                        <SummarizeSharpIcon />
+                    </ListItemIcon>
+                    Server Config
+                </ListItem>
+            </Link>
         </List>
     </Drawer>
     )

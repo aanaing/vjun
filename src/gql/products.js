@@ -43,6 +43,7 @@ query Products_by_pk($id: uuid!) {
       show_reviews
       discount_eligible
       sold_amount
+      barcode
       product_variations {
         color
         created_at
@@ -90,8 +91,8 @@ export const PRODUCT_VARIATIONS_BY_PK = gql`
 `
 
 export const CREATE_PRODUCT = gql`
-    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $description: String!, $category: uuid!, $brand: uuid!) {
-        insert_products_one(object: {description: $description, name: $name, price: $price, product_image_url: $product_image_url, fk_product_category_id: $category, fk_brand_id: $brand }) {
+    mutation Insert_Products_One($name: String!, $price: numeric!, $product_image_url: String!, $barcode: String!, $description: String!, $category: uuid!, $brand: uuid!) {
+        insert_products_one(object: {description: $description, name: $name, price: $price, barcode: $barcode, product_image_url: $product_image_url, fk_product_category_id: $category, fk_brand_id: $brand }) {
             created_at
             description
             id
@@ -99,6 +100,7 @@ export const CREATE_PRODUCT = gql`
             price
             product_image_url
             updated_at
+            barcode
             brand_name {
                 name
             }
@@ -107,8 +109,8 @@ export const CREATE_PRODUCT = gql`
 `
 
 export const CREATE_PRODUCT_VARIATION = gql`
-mutation Insert_Product_Variations_One($name: String!, $image_url: String!, $price: numeric!, $product_id: uuid!) {
-    insert_product_variations_one(object: {fk_product_id: $product_id, price: $price, variation_image_url: $image_url, variation_name: $name}) {
+mutation Insert_Product_Variations_One($name: String!, $image_url: String!, $price: numeric!, $product_id: uuid!, $color: String) {
+    insert_product_variations_one(object: {fk_product_id: $product_id, price: $price, variation_image_url: $image_url, variation_name: $name, color: $color}) {
       created_at
       fk_product_id
       id
@@ -145,8 +147,8 @@ mutation Delete_Products_by_pk($id: uuid!, $image_name: String!) {
 `
 
 export const UPDATE_PRODUCT = gql`
-mutation Update_Product_By_Id ($id: uuid!, $description: String, $discount: Boolean, $brand: uuid, $category: uuid, $name: String, $price: numeric, $product_image_url: String, $review: Boolean, $image_name: String!) {
-    update_products_by_pk(pk_columns: {id: $id}, _set: {description: $description, discount_eligible: $discount, fk_brand_id: $brand, fk_product_category_id: $category, name: $name, price: $price, product_image_url: $product_image_url, show_reviews: $review }) {
+mutation Update_Product_By_Id ($id: uuid!, $description: String, $discount: Boolean, $brand: uuid, $category: uuid, $name: String, $price: numeric, $product_image_url: String, $barcode: String!, $review: Boolean) {
+    update_products_by_pk(pk_columns: {id: $id}, _set: {description: $description, discount_eligible: $discount, fk_brand_id: $brand, fk_product_category_id: $category, name: $name, barcode: $barcode price: $price, product_image_url: $product_image_url, show_reviews: $review }) {
         created_at
         description
         id
@@ -154,19 +156,16 @@ mutation Update_Product_By_Id ($id: uuid!, $description: String, $discount: Bool
         price
         product_image_url
         updated_at
+        barcode
         brand_name {
             name
         }
-    }
-    deleteImage(imageName: $image_name) {
-      error
-      message
     }
   }  
 `
 
 export const UPDATE_PRODUCT_VARIATION = gql`
-mutation Update_Product_Variation_By_Id($id: uuid!, $image_name: String!, $color: String, $price: numeric, $image_url: String, $name: String) {
+mutation Update_Product_Variation_By_Id($id: uuid!, $color: String, $price: numeric, $image_url: String, $name: String) {
     update_product_variations_by_pk(pk_columns: {id: $id}, _set: {color: $color, price: $price, variation_image_url: $image_url, variation_name: $name}) {
         created_at
         fk_product_id
@@ -175,10 +174,6 @@ mutation Update_Product_Variation_By_Id($id: uuid!, $image_name: String!, $color
         updated_at
         variation_image_url
         variation_name
-    }
-    deleteImage(imageName: $image_name) {
-        error
-        message
     }
   }  
 `

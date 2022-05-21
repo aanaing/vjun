@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import product from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
-import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS } from '../../gql/misc'
+import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS, DELETE_IMAGE } from '../../gql/misc'
 import { UPDATE } from '../../gql/loyalty_products'
 
 import { Box, Card, CardContent, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
@@ -11,6 +11,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LoadingButton } from '@mui/lab';
+import RichTextEditor from 'react-rte'
 
 const fileTypes = [
     "image/apng",
@@ -35,6 +36,7 @@ const UpdateLoyaltyProduct = (props) => {
     const [ errors, setErrors ] = useState({
         name: '', price: '', description: '', image_url: '', amount_left: '', category_id: '', brand_id: '', date: ''
     })
+    const [ textValue, setTextValue ] = useState(RichTextEditor.createEmptyValue())
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
     const [ imageFileUrl, setImageFileUrl ] = useState(null)
@@ -63,6 +65,13 @@ const UpdateLoyaltyProduct = (props) => {
         },
     })
 
+    const [ deleteImage ] = useMutation(DELETE_IMAGE, {
+        onError: (error) => {
+            console.log('error : ', error)
+            setLoading(false)
+        },
+    })
+
     const [ updateProduct ] = useMutation(UPDATE, {
         onError: (error) => {
             console.log('error : ', error)
@@ -86,6 +95,7 @@ const UpdateLoyaltyProduct = (props) => {
     useEffect(() => {
         let product = props.product
         setValues({ name:  product.name, price: product.point_price, description: product.description, amount_left: product.amount_left, image_url: product.product_image_url, category_id: product.fk_product_category_id, brand_id: product.fk_brand_id, date: product.expiry_date})
+        setTextValue(RichTextEditor.createValueFromString(product.description, 'html'))
         setImagePreview(product.product_image_url)
         let image_url = product.product_image_url
         setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
@@ -141,7 +151,7 @@ const UpdateLoyaltyProduct = (props) => {
             errorObject.brand_id = 'Brand field is required.'
             isErrorExit = true
         }
-        if(!values.amount_left) {
+        if(isNaN(values.amount_left)) {
             errorObject.amount_left = 'Amount Left field is required.'
             isErrorExit = true
         }
@@ -153,6 +163,7 @@ const UpdateLoyaltyProduct = (props) => {
         try {
             if(isImageChange) {
                 await product.uploadImage(imageFileUrl, imageFile)
+                deleteImage({ variables: { image_name: oldImageName } })
             }
             updateProduct({variables: { ...values, id: props.product.id, image_name: oldImageName }})
         } catch (error) {
@@ -166,6 +177,31 @@ const UpdateLoyaltyProduct = (props) => {
             <em>Loading...</em>
           </div>
         )
+    }
+
+    const toolbarConfig = {
+        // Optionally specify the groups to display (displayed in the order listed).
+        display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'LINK_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
+        INLINE_STYLE_BUTTONS: [
+          {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
+          {label: 'Italic', style: 'ITALIC'},
+          {label: 'Underline', style: 'UNDERLINE'}
+        ],
+        BLOCK_TYPE_DROPDOWN: [
+          {label: 'Normal', style: 'unstyled'},
+          {label: 'Heading Large', style: 'header-one'},
+          {label: 'Heading Medium', style: 'header-two'},
+          {label: 'Heading Small', style: 'header-three'}
+        ],
+        BLOCK_TYPE_BUTTONS: [
+          {label: 'UL', style: 'unordered-list-item'},
+          {label: 'OL', style: 'ordered-list-item'}
+        ]
+      };
+
+    const onChange = (value) => {
+        setTextValue(value)
+       setValues({ ...values, description: value.toString('html') })
     }
 
     return (
@@ -185,13 +221,17 @@ const UpdateLoyaltyProduct = (props) => {
             flexDirection: 'column'
             }}
         >
-            <Card sx={{ display: 'flex', justifyContent: 'center' }} >
-                <CardMedia
-                    component="img"
-                    image={imagePreview}
-                    alt="Product"
-                    sx={{flex: 1, m: 5, bgcolor: '#cecece', maxHeight: 300}}
-                />
+            <Card sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }} >
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
+                    <CardMedia
+                        component="img"
+                        image={imagePreview}
+                        alt="Product"
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                    />
+                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
+                </Box>
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
                         <FormControl sx={{ m: 2 }} variant="outlined">
@@ -270,16 +310,6 @@ const UpdateLoyaltyProduct = (props) => {
                             </LocalizationProvider>
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="description" label="Description"
-                                value={values.description}
-                                onChange={handleChange('description')}
-                                error={errors.description? true: false}
-                                helperText={errors.description}
-                                multiline
-                                rows={3}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
                             <TextField id="amount_left" label="Amount Left"
                                 value={values.amount_left}
                                 onChange={handleChange('amount_left')}
@@ -288,18 +318,26 @@ const UpdateLoyaltyProduct = (props) => {
                                 type="number"
                             />
                         </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <LoadingButton
-                                variant="contained"
-                                loading={loading}
-                                onClick={handleCreate}
-                                sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
-                            >
-                                Update
-                            </LoadingButton>
-                        </FormControl>
                     </Box>
                 </CardContent>
+                <Box sx={{ my: 1 }}>
+                    <InputLabel>Description</InputLabel>
+                    <RichTextEditor style={{ height: '500px' }} value={textValue} onChange={onChange} toolbarConfig={toolbarConfig} />
+                    {
+                        errors.description && <FormHelperText error >{ errors.description }</FormHelperText>
+                    }
+                </Box>
+            </Box>
+                <FormControl sx={{ m: 2 }} variant="outlined">
+                    <LoadingButton
+                        variant="contained"
+                        loading={loading}
+                        onClick={handleCreate}
+                        sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
+                    >
+                        Update
+                    </LoadingButton>
+                </FormControl>
             </Card>
         </Box>
         {

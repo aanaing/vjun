@@ -115,6 +115,26 @@ const Product = () => {
                                 />
                               </ListItem>
                             </Box>
+                            <Box>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Reciver Account Name"
+                                  secondary={order.payment_receiver_account_number}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Reciver Name"
+                                  secondary={order.payment_receiver_namey}
+                                />
+                              </ListItem>
+                              <ListItem>
+                                <ListItemText
+                                  primary="Payment Service Name"
+                                  secondary={order.payment_service_name}
+                                />
+                              </ListItem>
+                            </Box>
                           </Paper>
                       </CardContent>
                   </Card>

@@ -1,10 +1,10 @@
 import React, { useState } from "react"
-import product from "../../services/image";
+import imageService from "../../services/image";
 import { useMutation } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
-import { CREATE_PRODUCT_VARIATION } from '../../gql/products'
+import { CREATE_ADS } from '../../gql/ads'
 
-import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button, InputLabel, MenuItem, Select, FormHelperText } from '@mui/material'
+import { Box, Card, CardContent, FormControl, TextField, CardMedia, Typography, Button } from '@mui/material'
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -20,15 +20,14 @@ const fileTypes = [
     "image/x-icon"
 ];
 
-const CreateProductVariation = ({ product_id, handleClose }) => {
+const CreateAds = ({ handleClose, adsAlert }) => {
 
     const [ loading, setLoading ] = useState(false)
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
     const [ values, setValues ] = useState({
-        name: '', price: '',  image_url: '', color: ''
+        image_url: '', external_url: '', 
     })
     const [ errors, setErrors ] = useState({
-        name: '', price: '', image_url: '', color: ''
+        image_url: '', external_url: '',
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
@@ -41,36 +40,26 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
     const [ getImageUrl ] = useMutation(GET_IMAGE_UPLOAD_URL, {
         onError: (error) => {
             console.log('error : ', error)
-            setShowAlert({ message: 'Error on server', isError: true })
-            setTimeout(() => {
-                setShowAlert({ message: '', isError: false })
-            }, 1000)
         },
         onCompleted: (result) => {
             setImageFileUrl(result.getImageUploadUrl.imageUploadUrl)
             setValues({ ...values, image_url: `https://axra.sgp1.digitaloceanspaces.com/VJun/${result.getImageUploadUrl.imageName}` })
         },
-        // refetchQueries: [ { query: PRODUCT_VARIATIONS } ]
     })
 
-    const [ createProductVariation ] = useMutation(CREATE_PRODUCT_VARIATION, {
+    const [ createAds ] = useMutation(CREATE_ADS, {
         onError: (error) => {
             console.log('error : ', error)
-            setShowAlert({ message: 'Error on server', isError: true })
-            setTimeout(() => {
-                setShowAlert({ message: '', isError: false })
-            }, 1000)
+            setLoading(false)
         },
         onCompleted: () => {
-            setValues({ name: '', price: '',  image_url: '', color: '' })
-            setErrors({ name: '', price: '',  image_url: '', color: '' })
+            setValues({ image_url: '', external_url: '', })
+            setErrors({ image_url: '', external_url: '', })
             setImageFile('')
             setImagePreview('')
             setLoading(false)
-            setShowAlert({ message: 'Product variation have been created.', isError: false })
-            setTimeout(() => {
-                setShowAlert({ message: '', isError: false })
-            }, 1000)
+            adsAlert('New Ads have been created.')
+            handleClose()
         },
     })
 
@@ -93,27 +82,15 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
 
     const handleCreate = async () => {
         setLoading(true)
-        setErrors({name: '', price: '',  image_url: ''})
+        setErrors({ image_url: '', external_url: '', })
         let isErrorExit = false
         let errorObject = {}
-        if(!values.name) {
-            errorObject.name = 'Name field is required.'
-            isErrorExit = true
-        }
-        if(!values.price) {
-            errorObject.price = 'Price field is required.'
-            isErrorExit = true
-        }
-        if(values.price && isNaN(+values.price)) {
-            errorObject.price = 'Price filed accepts only numeric number.'
-            isErrorExit = true
-        }
         if(!values.image_url || !imageFile) {
             errorObject.image_url = 'Image field is required.'
             isErrorExit = true
         }
-        if(!values.color) {
-            errorObject.color = 'Color field is required.'
+        if(!values.external_url) {
+            errorObject.external_url = 'External URL field is required.'
             isErrorExit = true
         }
         if(isErrorExit) {
@@ -122,8 +99,8 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
             return
         }
         try {
-            await product.uploadImage(imageFileUrl, imageFile)
-            createProductVariation({variables: { ...values, product_id: product_id }})
+            await imageService.uploadImage(imageFileUrl, imageFile)
+            createAds({variables: { ...values }})
         } catch (error) {
             console.log('error : ', error)
         }
@@ -132,7 +109,7 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
     return (
         <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
-                <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Product Variation</Typography>
+                <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Ads</Typography>
                 <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
@@ -141,28 +118,12 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
                         component="img"
                         image={imagePreview}
                         alt="Product"
-                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
                     />
                     <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
                 </Box>
                 <CardContent sx={{flex: 3}}>
                     <Box sx={{ display: 'flex', flexDirection: 'column'}} >
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="name" label="Name"
-                                value={values.name}
-                                onChange={handleChange('name')}
-                                error={errors.name? true: false}
-                                helperText={errors.name}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="price" label="General Price"
-                                value={values.price}
-                                onChange={handleChange('price')}
-                                error={errors.price? true: false}
-                                helperText={errors.price}
-                            />
-                        </FormControl>
                         <FormControl sx={{ m: 2 }}>
                             <TextField id="image" placeholder="Upload image" InputLabelProps={{ shrink: true }} label="Upload Image"
                                 onChange={imageChange}
@@ -172,20 +133,12 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="color">Color</InputLabel>
-                          <Select
-                            labelId="review"
-                            value={values.color}
-                            label="Color"
-                            onChange={handleChange('color')}
-                            error={errors.color? true:false}
-                          >
-                            <MenuItem value='Red' >Red</MenuItem>
-                            <MenuItem value='Green' >Green</MenuItem>
-                          </Select>
-                          {
-                            errors.review && <FormHelperText error >{errors.review}</FormHelperText>
-                          }
+                            <TextField id="external_url" label="External URL"
+                                value={values.external_url}
+                                onChange={handleChange('external_url')}
+                                error={errors.external_url? true: false}
+                                helperText={errors.external_url}
+                            />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">
                             <LoadingButton
@@ -200,14 +153,8 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
                     </Box>
                 </CardContent>
             </Card>
-        {
-            (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'absolute', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
-        }
-        {
-            (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'absolute', bottom: '1em', right: '1em' }} severity="warning">{showAlert.message}</Alert>
-        }
         </div>
     )
 }
 
-export default CreateProductVariation
+export default CreateAds

@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 
 export const ORDERS = gql`
 query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!) {
-    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {user: {name: {_ilike: $search}}, order_status: {_ilike: $status}}}) {
+    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {order_status: {_ilike: $status}, user: {name: {_ilike: $search}}}}) {
         created_at
         fk_user_id
         id
@@ -16,7 +16,31 @@ query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!) {
           id
         }
     }
-    user_order_aggregate(where: {order_status: {_ilike: $status}}) {
+    user_order_aggregate(where: {_and: {order_status: {_ilike: $status}, user: {name: {_ilike: $search}}}}) {
+      aggregate {
+        count
+      }
+    }
+}
+`
+
+export const ORDERSWITHDATE = gql`
+query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!, $start: timestamptz, $end: timestamptz) {
+    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {order_status: {_ilike: $status},  _or: {user: {name: {_ilike: $search}}, created_at: {_gte: $start, _lt: $end}}}}) {
+        created_at
+        fk_user_id
+        id
+        order_status
+        payment_screenshot_image_url
+        total_price
+        total_quantity
+        updated_at
+        user {
+          name
+          id
+        }
+    }
+    user_order_aggregate(where: {_and: {order_status: {_ilike: $status},  _or: {user: {name: {_ilike: $search}}, created_at: {_gte: $start, _lt: $end}}}}) {
       aggregate {
         count
       }
@@ -40,6 +64,8 @@ query Order_By_Pk ($id: uuid!) {
         created_at
         fk_user_id
         id
+        order_readable_id
+        address
         order_status
         payment_screenshot_image_url
         payment_receiver_account_number
@@ -51,6 +77,14 @@ query Order_By_Pk ($id: uuid!) {
         payment_method
         order_items {
           fk_product_variation_id
+          product_variation {
+            variation_name
+            variation_image_url
+            product {
+              id
+              name
+            }
+          }
           fk_order_id
           id
           quantity
@@ -97,4 +131,38 @@ mutation Update_User_Order($id: uuid!, $status: String!) {
   }
 }
 `
-  
+
+export const ALL_ORDER_COUNT = gql`
+query All_Order_Count {
+  all: user_order_aggregate {
+    aggregate {
+      count
+    }
+  }
+  pending: user_order_aggregate(where: {order_status: {_ilike: "pending"}}) {
+    aggregate {
+      count
+    }
+  }
+  verified: user_order_aggregate(where: {order_status: {_ilike: "payment_verified"}}) {
+    aggregate {
+      count
+    }
+  }
+  delivering: user_order_aggregate(where: {order_status: {_ilike: "delivering"}}) {
+    aggregate {
+      count
+    }
+  }
+  completed: user_order_aggregate(where: {order_status: {_ilike: "completed"}}) {
+    aggregate {
+      count
+    }
+  }
+  cancelled: user_order_aggregate(where: {order_status: {_ilike: "cancelled"}}) {
+    aggregate {
+      count
+    }
+  }
+}
+`

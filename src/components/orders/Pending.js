@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Box, FormControl, TextField, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TablePagination,
-Button, Alert
+Button, FormHelperText, Alert
 } from '@mui/material'
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useLazyQuery, useMutation } from '@apollo/client'
-import { ORDERS, VERIFIE_ORDER } from '../../gql/orders'
+import { ORDERS, ORDERSWITHDATE, UPDATE_ORDER_STATUS} from '../../gql/orders'
 
 const Pending = ({ detailOrder }) => {
 
@@ -13,29 +16,26 @@ const Pending = ({ detailOrder }) => {
     const [ rowsPerPage, setRowsPerPage ] = useState(10)
     const [ offset, setOffset ] = useState(0)
     const [ orders, setOrders ] = useState(null)
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false });
+    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
+
+    const [ startDate, setStartDate] = useState(null)
+    const [ dateError, setDateError ] = useState('')
+    const [ endDate, setEndDate ] = useState(new Date())
 
     const [ loadOrders, result ] = useLazyQuery(ORDERS)
-    const [ verify ] = useMutation(VERIFIE_ORDER, {
-      onError: (error) => {
-        console.log('error : ', error)
-        setShowAlert({ message: 'Error on server', isError: true })
-        setTimeout(() => {
-            setShowAlert({ message: '', isError: false })
-        }, 2000)
-      },
-      onCompleted: (result) => {
-        setShowAlert({ message: result.verifyPayment.message, isError: false })
-        setTimeout(() => {
-            setShowAlert({ message: '', isError: false })
-        }, 2000)
-      },
-      refetchQueries: [ORDERS]
-    })
+    const [ loadOrdersWithDate, resultWithDate ] = useLazyQuery(ORDERSWITHDATE)
 
     useEffect(() => {
-        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%pending%' }})
-    }, [loadOrders, offset, rowsPerPage, search])
+      if(startDate && endDate) {
+        if((startDate && endDate) && startDate > endDate) {
+          setDateError('Date From must be smaller than Date To!')
+          return
+        }
+        loadOrdersWithDate({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%pending%', start: startDate, end: endDate }})
+      } else {
+        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%pending%'}})
+      }
+    }, [endDate, loadOrders, loadOrdersWithDate, offset, rowsPerPage, search, startDate])
 
     useEffect(() => {
         if(result.data) {
@@ -44,6 +44,27 @@ const Pending = ({ detailOrder }) => {
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [result ])
+
+    useEffect(() => {
+      if(resultWithDate.data) {
+        setOrders(resultWithDate.data.user_order)
+        setCount(Number(resultWithDate.data?.user_order_aggregate.aggregate.count))
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [result ])
+
+    const [ updateStatus ] = useMutation(UPDATE_ORDER_STATUS, {
+      onError: (error) => {
+        console.log('error : ', error)
+      },
+      onCompleted: (r) => {
+        setShowAlert({ message: `Order's status have been changed to ${r.update_user_order_by_pk.order_status}`, isError: false })
+        setTimeout(() => {
+            setShowAlert({ message: '', isError: false })
+        }, 2000)
+        result.refetch()
+      },
+    })
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -65,13 +86,47 @@ const Pending = ({ detailOrder }) => {
 
     return (
     <div>
-        <Box sx={{ display: 'flex', justifyContent: 'end', alignItems: 'center', width: '100%' }} >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', my: 2 }} >
           <FormControl sx={{ width: 300 }} >
             <TextField id="outlined-search" label="Search by User's name" type="search" 
               value={search}
               onChange={(e) => { setSearch(e.target.value) }}
             />
           </FormControl>
+          <Box>
+            <FormControl sx={{ mr: 2 }}>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <DesktopDatePicker
+                      label="Date From"
+                      value={startDate}
+                      onChange={(newValue) => {
+                        setDateError('')
+                        setStartDate(newValue)
+                      }}
+                      renderInput={(params) => <TextField {...params} />}
+                  />
+                  {
+                    dateError && <FormHelperText error >{dateError}</FormHelperText>
+                  }
+              </LocalizationProvider>
+            </FormControl>
+            <FormControl>
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                  <DesktopDatePicker
+                      label="Date To"
+                      value={endDate}
+                      onChange={(newValue) => {
+                        setDateError('')
+                        setEndDate(newValue)
+                      }}
+                      renderInput={(params) => <TextField {...params} />}
+                  />
+                  {
+                    dateError && <FormHelperText error >{dateError}</FormHelperText>
+                  }
+              </LocalizationProvider>
+            </FormControl>
+          </Box>
         </Box>
         <Box
           sx={{
@@ -106,11 +161,8 @@ const Pending = ({ detailOrder }) => {
                   <TableCell style={{ minWidth: 70 }} >
                     Created At
                   </TableCell>
-                  <TableCell style={{ minWidth: 70 }} >
-                    Detail
-                  </TableCell>
                   <TableCell style={{ minWidth: 70 }}>
-                    Status
+                    Action
                   </TableCell>
               </TableRow>
             </TableHead>
@@ -138,11 +190,9 @@ const Pending = ({ detailOrder }) => {
                     </TableCell>
                     <TableCell>
                       <Button color="secondary" size="small" onClick={() => detailOrder(row)}>Detail</Button>
-                    </TableCell>
-                    <TableCell>
-                      <Button size="small" variant="contained" color="success" onClick={() => {
-                        verify({ variables: { id: row.id} })
-                      }}>Change to Verify</Button>
+                      <Button color="success" variant="contained" onClick={() => {
+                        updateStatus({ variables: { id: row.id, status: 'verified'} })
+                      }}>Verified</Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -161,10 +211,10 @@ const Pending = ({ detailOrder }) => {
           />
         </Box>
         {
-          (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'absolute', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>
+          (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: 10 }} severity="success">{showAlert.message}</Alert>
         }
         {
-          (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'absolute', bottom: '1em', right: '1em' }} severity="warning">{showAlert.message}</Alert>
+          (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: 10 }} severity="warning">{showAlert.message}</Alert>
         }
     </div>
     )

@@ -24,10 +24,10 @@ const UpdateAds = ({ handleClose, adsAlert, ad }) => {
 
     const [ loading, setLoading ] = useState(false)
     const [ values, setValues ] = useState({
-        image_url: '', external_url: '', 
+        image_url: '', external_url: '', title: ''
     })
     const [ errors, setErrors ] = useState({
-        image_url: '', external_url: '',
+        image_url: '', external_url: '', title: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
@@ -63,8 +63,8 @@ const UpdateAds = ({ handleClose, adsAlert, ad }) => {
             setLoading(false)
         },
         onCompleted: () => {
-            setValues({ image_url: '', external_url: '', })
-            setErrors({ image_url: '', external_url: '', })
+            setValues({ image_url: '', external_url: '', title: ''})
+            setErrors({ image_url: '', external_url: '', title: ''})
             setImageFile('')
             setImagePreview('')
             setLoading(false)
@@ -74,11 +74,11 @@ const UpdateAds = ({ handleClose, adsAlert, ad }) => {
     })
 
     useEffect(() => {
-        setValues({ external_url: ad.external_url, image_url: ad.image_url })
+        setValues({ external_url: ad.external_url, image_url: ad.image_url, title: ad.title })
         setImagePreview(ad.image_url)
         let image_url = ad.image_url
         setOldImageName(image_url.substring(image_url.lastIndexOf('/') + 1,image_url.lenght ))
-    }, [ad.external_url, ad.image_url])
+    }, [ad.external_url, ad.image_url, ad.title])
 
     const imageChange = async (e) => {
         if(e.target.files && e.target.files[0]) {
@@ -150,6 +150,14 @@ const UpdateAds = ({ handleClose, adsAlert, ad }) => {
                                 error={errors.image_url? true: false}
                                 helperText={errors.image_url}
                                 type="file" accept="image/png, image/jpeg, image/jpg, image/gif, image/svg+xml"
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }} variant="outlined">
+                            <TextField id="title" label="Title"
+                                value={values.title}
+                                onChange={handleChange('title')}
+                                error={errors.title? true: false}
+                                helperText={errors.title}
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">

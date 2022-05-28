@@ -3,6 +3,7 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { styled } from '@mui/material/styles';
@@ -63,8 +64,8 @@ const Header = ({ handleDrawerOpen, open }) => {
     }
 
     return (
-        <AppBar position="fixed" open={open} sx={{ bgcolor: '#c4c4c4', color: 'black' }} >
-        <Toolbar>
+        <AppBar position="fixed" open={open} sx={{ bgcolor: '#F8F7FC', color: 'black' }} >
+        <Toolbar sx={{ border: '3px solid white' }}>
           <IconButton
             size="large"
             edge="start"
@@ -73,7 +74,9 @@ const Header = ({ handleDrawerOpen, open }) => {
             sx={{ mr: 2 }}
             onClick={handleDrawerOpen}
           >
-            <MenuIcon />
+            {
+              open ? <CloseIcon /> :  <MenuIcon />
+            }
           </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 V.Jun Dashboard

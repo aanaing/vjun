@@ -39,5 +39,15 @@ mutation Delete_Brand_Name ($id: uuid!) {
       id
     }
   }
-  
+`
+
+export const UPDATE_POSITION = gql`
+mutation Update_Brand_Position ($id: uuid!, $updateAt: timestamptz) {
+  update_brand_name_by_pk(pk_columns: {id: $id}, _set: {updated_at: $updateAt}) {
+    created_at
+    id
+    name
+    updated_at
+  }
+}
 `

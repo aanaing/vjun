@@ -1,52 +1,36 @@
 import React from 'react';
-import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { Box, Avatar } from '@mui/material'
 
-// import { useQuery } from '@apollo/client'
-// import { ORDER_ITEMS_BY_ID } from '../../gql/orders'
+import { Link } from 'react-router-dom'
 
 export default function ProductVariationTable({ items }) {
 
-    // const result = useQuery(ORDER_ITEMS_BY_ID, { variables: { id: id } })
-
-    // if(result.loading ) {
-    //     return (
-    //       <div>
-    //         <em>Loading...</em>
-    //       </div>
-    //     )
-    // }
-
-    // const items = result.data.order_item
-
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+    <Box sx={{ width: '100%', overflow: 'hidden' }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-                <TableCell style={{ minWidth: 70 }}>
-                  ID
+                <TableCell style={{ minWidth: 70 }} className='MuiTableCell-head-secondary' >
+                  Product Name
                 </TableCell>
-                <TableCell style={{ minWidth: 50 }}>
-                  Product Variation ID
+                <TableCell style={{ minWidth: 70 }} className='MuiTableCell-head-secondary'>
+                  Product Variation
                 </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
+                <TableCell style={{ minWidth: 70 }} className='MuiTableCell-head-secondary'>
+                  Image
+                </TableCell>
+                <TableCell style={{ minWidth: 70 }} className='MuiTableCell-head-secondary'>
                   Quantity
                 </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
+                <TableCell style={{ minWidth: 70 }} className='MuiTableCell-head-secondary'>
                   Order Price For one Item
-                </TableCell>
-                <TableCell style={{ minWidth: 50 }}>
-                  Created At
-                </TableCell>
-                <TableCell style={{ minWidth: 50 }}>
-                  Updated At
                 </TableCell>
             </TableRow>
           </TableHead>
@@ -55,10 +39,17 @@ export default function ProductVariationTable({ items }) {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell >
-                       {row.id}
+                       {row.product_variation?.product?.name}
                     </TableCell>
                     <TableCell >
-                       {row.fk_product_variation_id}
+                      <Link to={`/product/${row?.product_variation.product.id}`}>{row.product_variation?.variation_name}</Link>
+                    </TableCell>
+                    <TableCell>
+                      <Avatar
+                        alt="User"
+                        src={row.product_variation?.variation_image_url}
+                        sx={{ width: 56, height: 56 }}
+                      >P</Avatar>
                     </TableCell>
                     <TableCell >
                        {row.quantity}
@@ -66,18 +57,12 @@ export default function ProductVariationTable({ items }) {
                     <TableCell >
                        {row.order_price_for_one_item}
                     </TableCell>
-                    <TableCell>
-                      {row.created_at.substring(0, 10)}
-                    </TableCell>
-                    <TableCell >
-                      {row.updated_at.substring(0, 10)}
-                    </TableCell>
                   </TableRow>
                 );
               })}
           </TableBody>
         </Table>
       </TableContainer>
-    </Paper>
+    </Box>
   );
 }

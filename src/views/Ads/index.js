@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client'
-import { ADS, DELETE_ADS } from '../../gql/ads'
+import { ADS, DELETE_ADS, UPDATE_POSITION } from '../../gql/ads'
 import { DELETE_IMAGE } from '../../gql/misc'
 import { 
   Box, Breadcrumbs, Button, Modal, Alert, Typography, Card, CardActions, CardMedia, CardContent
@@ -60,6 +60,20 @@ const Index = () => {
     onError: (error) => {
       console.log('error : ', error)
     },
+  })
+
+  const [ updatePosition ] = useMutation(UPDATE_POSITION, {
+    onError: (error) => {
+      console.log('error: ', error)
+    },
+    onCompleted: (res) => {
+      setShowAlert({ message: `Ads "${res?.update_ads_by_pk.title}" have been put to the top.`, isError: false })
+      setTimeout(() => {
+        setShowAlert({ message: '', isError: false })
+      }, 3000)
+      handleCloseD()
+    },
+    refetchQueries: [ADS]
   })
 
   if(result.loading) {
@@ -148,16 +162,23 @@ const Index = () => {
                             alt="Ads"
                         />
                         <CardContent >
-                            <Typography variant="subtitle1" color="text.secondary" component="div">
-                                External URL
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" component="a" herf={row.external_url} >
-                                { row.external_url }
-                            </Typography>
+                          <Typography variant="subtitle1" color="text.secondary" component="div">
+                            Title
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" component="a" herf={row.external_url} >
+                            { row.title }
+                          </Typography>
+                          <Typography variant="subtitle1" color="text.secondary" component="div">
+                              External URL
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" component="a" herf={row.external_url} >
+                              { row.external_url }
+                          </Typography>
                         </CardContent>
                         <CardActions>
-                            <Button onClick={() => handleOpenE(row)} color="primary" size="small">Edit</Button>
-                            <Button onClick={() => handleOpenD(row)} color="error" size="small">Remove</Button>
+                          <Button color="secondary" onClick={() => updatePosition({ variables: { id: row.id, updateAt: new Date().toISOString() } })}>Put to Top</Button>
+                          <Button onClick={() => handleOpenE(row)} color="primary" size="small">Edit</Button>
+                          <Button onClick={() => handleOpenD(row)} color="error" size="small">Remove</Button>
                         </CardActions>
                     </Card>
                 ))

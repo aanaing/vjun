@@ -14,15 +14,14 @@ const Index = () => {
   const [ page, setPage ] = useState(0)
   const [ rowsPerPage, setRowsPerPage ] = useState(10)
   const [ offset, setOffset ] = useState(0)
-  const [ name, setName ] = useState('')
-  const [ phone, setPhone ] = useState('')
+  const [ search, setSearch ] = useState('')
   const [ users, setUsers ] = useState(null)
 
   const [ loadUsers, result ] = useLazyQuery(USERS)
 
   useEffect(() => {
-      loadUsers({ variables: { limit: rowsPerPage, offset: offset, phone: `%${phone}%`, name: `%${name}%` } })
-  }, [loadUsers, offset, rowsPerPage, phone, name])
+      loadUsers({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%` } })
+  }, [loadUsers, offset, rowsPerPage, search])
 
   useEffect(() => {
     if(result.data) {
@@ -62,23 +61,12 @@ const Index = () => {
       </Breadcrumbs>
     </div>
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', my: 2 }} >
-      <FormControl sx={{ width: 200 }} >
-        <TextField id="search-by-name" label="Search By Name" type="search" 
-          value={name}
-          onChange={(e) => { setName(e.target.value) }}
+      <FormControl sx={{ width: 300 }} >
+        <TextField id="search-by-phone" label="Search By Name or Phone" type="search" 
+          value={search}
+          onChange={(e) => { setSearch(e.target.value) }}
         />
       </FormControl>
-      <FormControl sx={{ width: 200 }} >
-        <TextField id="search-by-phone" label="Search By Phone" type="search" 
-          value={phone}
-          onChange={(e) => { setPhone(e.target.value) }}
-        />
-      </FormControl>
-      {/* <Stack direction="row" spacing={1} alignItems="center">
-        <Typography>By Phone</Typography>
-        <Switch checked={byName} onChange={(e) => setByName(e.target.checked)} />
-        <Typography>By Name</Typography>
-      </Stack> */}
     </Box>
     <Box
       sx={{
@@ -106,9 +94,6 @@ const Index = () => {
               </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Phone
-              </TableCell>
-              <TableCell style={{ minWidth: 100 }}>
-                Address
               </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Loyalty Points
@@ -149,9 +134,6 @@ const Index = () => {
                     </TableCell>
                     <TableCell >
                         {row.phone}
-                    </TableCell>
-                    <TableCell >
-                        {row.address}
                     </TableCell>
                     <TableCell >
                         {row.loyalty_points}

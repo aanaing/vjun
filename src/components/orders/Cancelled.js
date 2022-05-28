@@ -8,7 +8,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useLazyQuery } from '@apollo/client'
 import { ORDERS, ORDERSWITHDATE } from '../../gql/orders'
 
-const Completed = ({ detailOrder }) => {
+const Cancelled = ({ detailOrder }) => {
 
     const [ search, setSearch ] = useState('')
     const [ count, setCount ] = useState(0)
@@ -30,9 +30,9 @@ const Completed = ({ detailOrder }) => {
           setDateError('Date From must be smaller than Date To!')
           return
         }
-        loadOrdersWithDate({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%completed%', start: startDate, end: endDate }})
+        loadOrdersWithDate({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%cancelled%', start: startDate, end: endDate }})
       } else {
-        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%completed%'}})
+        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%cancelled%'}})
       }
     }, [endDate, loadOrders, loadOrdersWithDate, offset, rowsPerPage, search, startDate])
 
@@ -72,7 +72,7 @@ const Completed = ({ detailOrder }) => {
 
     return (
         <div>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', my: 2 }} >
+         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', my: 2 }} >
           <FormControl sx={{ width: 300 }} >
             <TextField id="outlined-search" label="Search by User's name" type="search" 
               value={search}
@@ -193,8 +193,8 @@ const Completed = ({ detailOrder }) => {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Box>
-        </div>
+      </div>
     )
 }
 
-export default Completed
+export default Cancelled

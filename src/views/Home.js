@@ -22,6 +22,8 @@ const LoyaltyProduct = lazy(() => import('./loyalty_products/LoyaltyProduct'))
 const Brands = lazy(() => import('./brands/index'))
 const Ads = lazy(() => import('./Ads/index'))
 const ServerConfig = lazy(() => import('./server_config/index'))
+const BankingAccount = lazy(() => import('./banking_account/index'))
+const Claimeds = lazy(() => import('./claimed_history/index'))
 
 const drawerWidth = 340;
 
@@ -60,8 +62,8 @@ const Admin = () => {
   const AuthContext = createContext()
   const [ auth, setAuth ] = useState(null)
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const handleDrawer = () => {
+    setOpen(!open);
   };
 
   const handleDrawerClose = () => {
@@ -87,9 +89,9 @@ useEffect(() => {
 }, [])
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', bgcolor: '#F8F7FC', minHeight: '100vh' }}>
       <CssBaseline />
-      <Header open={open} handleDrawerOpen={handleDrawerOpen} />
+      <Header open={open} handleDrawerOpen={handleDrawer} />
     <SideBar handleDrawerClose={handleDrawerClose} open={open} />
       <Main open={open}>
           <DrawerHeader />
@@ -101,6 +103,7 @@ useEffect(() => {
                 <Route path="/product/:id" element={<Product homeAlert={homeAlert} />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/order/:id" element={<Order />} />
+                <Route path='/claimed_histories' element={<Claimeds />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path='/users' element={<Users />} />
                 <Route path='/user/:id' element={<User />} />
@@ -109,6 +112,7 @@ useEffect(() => {
                 <Route path='/brands' element={<Brands />} />
                 <Route path='/ads' element={<Ads />} />
                 <Route path='/server_config' element={ <ServerConfig /> } />
+                <Route path='/banking_accounts' element={ <BankingAccount /> } />
               </Routes>
             </AuthContext.Provider>
           </Suspense>

@@ -4,11 +4,20 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import SummarizeSharpIcon from '@mui/icons-material/SummarizeSharp';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ShoppingBasketIcon from '@mui/icons-material/ShoppingBasket';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
+import SettingsIcon from '@mui/icons-material/Settings';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
+import AccessAlarmsTwoToneIcon from '@mui/icons-material/AccessAlarmsTwoTone';
+
 import{ Box, Avatar } from '@mui/material'
 import logo from '../static/logo192.png'
 
@@ -42,78 +51,94 @@ const SideBar = ({ handleDrawerClose, open }) => {
         anchor="left"
         open={open}
     >
-        <DrawerHeader sx={{ bgcolor: '#c4c4c4' }} >
+        <DrawerHeader sx={{ }} >
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center' }} >
-                <Avatar alt="Remy Sharp" src={logo} />
+                <Avatar alt="V.Jun" src={logo} className='nav-logo' />
             </Box>
-        <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
+            {/* <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton> */}
         </DrawerHeader>
-        <Divider />
-        <List>
-            <Link to="/orders">
-                <ListItem button>
+        {/* <Divider /> */}
+        <List className='nav-list' >
+            <Link to="/orders" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                       <ShoppingCartIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Orders
                 </ListItem>
             </Link>
-            <Link to="/products">
-                <ListItem button>
+            <Link to="/products" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <LocalOfferIcon className='nav-link-icon' />
                     </ListItemIcon>
                     Products
                 </ListItem>
             </Link>
-            <Link to="/loyalty_products">
-                <ListItem button>
+            <Link to="/loyalty_products" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <LoyaltyIcon className='nav-link-icon' />
                     </ListItemIcon>
                     Loyalty Products
                 </ListItem>
             </Link>
-            <Link to="/users">
-                <ListItem button>
+            <Link to="/claimed_histories" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <SummarizeSharpIcon className='nav-link-icon' />
+                    </ListItemIcon>
+                    Claimed Histories
+                </ListItem>
+            </Link>
+            <Link to="/users" className='nav-link'>
+                <ListItem button className='nav-btn'>
+                    <ListItemIcon>
+                        <AccountCircleIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Users
                 </ListItem>
             </Link>
-            <Link to="/categories">
-                <ListItem button>
+            <Link to="/categories" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <ShoppingBasketIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Categories
                 </ListItem>
             </Link>
-            <Link to="/brands">
-                <ListItem button>
+            <Link to="/brands" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <VerifiedIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Brands
                 </ListItem>
             </Link>
-            <Link to="/ads">
-                <ListItem button>
+            <Link to="/ads" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <BrokenImageIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Ads
                 </ListItem>
             </Link>
-            <Link to="/server_config">
-                <ListItem button>
+            <Link to="/server_config" className='nav-link'>
+                <ListItem button className='nav-btn'>
                     <ListItemIcon>
-                        <SummarizeSharpIcon />
+                        <SettingsIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Server Config
+                </ListItem>
+            </Link>
+            <Link to="/banking_accounts" className='nav-link'>
+                <ListItem button className='nav-btn'>
+                    <ListItemIcon>
+                        <CreditCardIcon className='nav-link-icon'/>
+                    </ListItemIcon>
+                    Banking Account
                 </ListItem>
             </Link>
         </List>

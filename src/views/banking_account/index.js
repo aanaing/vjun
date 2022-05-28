@@ -1,36 +1,36 @@
 import React, { useState } from "react"
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client'
-import { BRANDS, DELETE_BRAND, UPDATE_POSITION } from '../../gql/brands'
+import { BANKING_ACCOUNTS, DELETE_BANKING_ACCOUNT } from '../../gql/banking_accounts'
 import { 
-  Box, Breadcrumbs, Button, TableContainer, Table, TableHead, Modal,
-  TableBody, TableRow, TableCell, Alert, Typography
+    Box, Breadcrumbs, Button, TableContainer, Table, TableHead, Modal,
+    TableBody, TableRow, TableCell, Alert, Typography
 } from '@mui/material'
-import CreateBrand from "../../components/brands/CreateBrand"
-import UpdateBrand from "../../components/brands/UpdateBrand"
+import CreateBankingAccount from '../../components/bankingAccounts/CreateBankingAccount'
+import UpdateBankingAccount from "../../components/bankingAccounts/UpdateBankingAccount"
 
 const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '100vw',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '100vw',
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
 };
 
 const styleD = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 350,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 350,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
 };
 
 const Index = () => {
@@ -39,40 +39,21 @@ const Index = () => {
   const [ open, setOpen ] = useState(false)
   const [ openE, setOpenE ] = useState(false)
   const [ openD, setOpenD ] = useState(false)
-  const [ brand, setBrand ] = useState(null)
+  const [ account, setAccount ] = useState(null)
 
-  const result = useQuery(BRANDS)
+  const result = useQuery(BANKING_ACCOUNTS)
 
-  const [ deleteBrand ] = useMutation(DELETE_BRAND, {
+  const [ deleteAccount ] = useMutation(DELETE_BANKING_ACCOUNT, {
     onError: (error) => {
       console.log('error : ', error)
-      setShowAlert({ message: 'Error on server', isError: true })
-      setTimeout(() => {
-        setShowAlert({ message: '', isError: false })
-      }, 3000)
-      handleCloseD()
     },
     onCompleted: () => {
-      setShowAlert({ message: `Brand have been removed.`, isError: false })
+      setShowAlert({ message: `Account have been removed.`, isError: false })
       setTimeout(() => {
         setShowAlert({ message: '', isError: false })
       }, 3000)
       handleCloseD()
     }
-  })
-
-  const [ updatePosition ] = useMutation(UPDATE_POSITION, {
-    onError: (error) => {
-      console.log('error: ', error)
-    },
-    onCompleted: (res) => {
-      setShowAlert({ message: `Brand "${res?.update_brand_name_by_pk.name}" have been put to the top.`, isError: false })
-      setTimeout(() => {
-        setShowAlert({ message: '', isError: false })
-      }, 3000)
-      handleCloseD()
-    },
-    refetchQueries: [BRANDS]
   })
 
   if(result.loading) {
@@ -83,41 +64,44 @@ const Index = () => {
     )
   }
 
-  const brandAlert = (message, isError = false) => {
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+      result.refetch()
+      setOpen(false)
+  };
+  const handleOpenE = (row) => {
+      setAccount(row)
+      setOpenE(true)
+  };
+  const handleCloseE = () => {
+      result.refetch()
+      setOpenE(false)
+  };
+  const handleOpenD = (row) => {
+    setAccount(row)
+    setOpenD(true)
+  };
+  const handleCloseD = () => {
+      result.refetch()
+      setOpenD(false)
+  };
+
+
+  const bankingAlert = (message, isError = false) => {
     setShowAlert({ message: message, isError: isError})
     setTimeout(() => {
       setShowAlert({ message: '', isError: false })
     }, 3000)
   }
 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        result.refetch()
-        setOpen(false)
-    };
-    const handleOpenE = (row) => {
-        setBrand(row)
-        setOpenE(true)
-    };
-    const handleCloseE = () => {
-        result.refetch()
-        setOpenE(false)
-    };
-    const handleOpenD = (row) => {
-        setBrand(row)
-        setOpenD(true)
-    };
-    const handleCloseD = () => {
-        result.refetch()
-        setOpenD(false)
-    };
-    
   const handleDelete = () => {
-    if(!brand) {
+    if(!account) {
       return
     }
-    deleteBrand({ variables: { id: brand.id } })
+    deleteAccount({ variables: { id: account.id } })
   }
+
+  const accounts = result.data.banking_accounts
 
   return (
     <div>
@@ -127,12 +111,12 @@ const Index = () => {
               Dashboard
             </Link>
             <span>
-              Brands
+              Banking Accounts
             </span>
           </Breadcrumbs>
         </div>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} >
-          <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'Add Brand'}</Button>
+          <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'Add One'}</Button>
         </Box>
         <Box
           sx={{
@@ -149,17 +133,14 @@ const Index = () => {
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                  <TableCell style={{ minWidth: 10 }} >
-                    ID
+                  <TableCell style={{ minWidth: 70 }} >
+                    Service Name
                   </TableCell>
                   <TableCell style={{ minWidth: 70 }} >
-                    Name
+                    Receiver Name
                   </TableCell>
                   <TableCell style={{ minWidth: 70 }} >
-                    Updated At
-                  </TableCell>
-                  <TableCell style={{ minWidth: 70 }} >
-                    Created At
+                    Account Number
                   </TableCell>
                   <TableCell style={{ minWidth: 70 }} >
                     Action
@@ -168,24 +149,20 @@ const Index = () => {
               </TableHead>
               <TableBody>
                 {
-                  result?.data?.brand_name.map((row, index) => (
+                  accounts.map((row, index) => (
                     <TableRow onClick={() => null} key={index} hover role="checkbox" tabIndex={-1} >
                         <TableCell>
-                            {row.id}
+                            {row.payment_service_name}
                         </TableCell>
                         <TableCell>
-                            {row.name}
+                            {row.receiver_name}
                         </TableCell>
                         <TableCell >
-                            {row.created_at.substring(0, 10)}
+                            {row.account_number}
                         </TableCell>
                         <TableCell >
-                            {row.updated_at.substring(0, 10)}
-                        </TableCell>
-                        <TableCell >
-                          <Button color="secondary" onClick={() => updatePosition({ variables: { id: row.id, updateAt: new Date().toISOString() } })}>Put to Top</Button>
-                          <Button onClick={() => handleOpenE(row)} color="primary" >Edit</Button>
-                          <Button onClick={() => handleOpenD(row)} color="error" >Remove</Button>
+                            <Button onClick={() => handleOpenE(row)} color="primary" >Edit</Button>
+                            <Button onClick={() => handleOpenD(row)} color="error" >Remove</Button>
                         </TableCell>
                     </TableRow>
                   ))
@@ -202,10 +179,10 @@ const Index = () => {
             >
             <Box sx={styleD}>
             <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-                Remove brand "{brand?.name}"
+                Confirmation
             </Typography>
             <Typography id="keep-mounted-modal-description" sx={{ mt: 2 }}>
-                Are you sure want to remove?
+                Are you sure want to remove "{account?.receiver_name}'s account"?
             </Typography>
             <Box sx={{ textAlign: 'right', mt: 2 }}>
                 <Button color='secondary' onClick={handleCloseD} >Cancel</Button>
@@ -216,14 +193,14 @@ const Index = () => {
         </Box>
         <div style={{ minHeight: 'auto' }}>
             <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
-                    <CreateBrand brandAlert={brandAlert} handleClose={handleClose} />
-                </Box>
+              <Box sx={style}>
+                <CreateBankingAccount handleClose={handleClose} bankingAlert={bankingAlert} />
+              </Box>
             </Modal>
         </div>
         <div style={{ minHeight: 'auto' }}>
@@ -234,7 +211,7 @@ const Index = () => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    <UpdateBrand brandAlert={brandAlert} handleClose={handleCloseE} brand={brand} brand_id={brand?.id} />
+                  <UpdateBankingAccount bankingAlert={bankingAlert} handleClose={handleCloseE} account={account} />
                 </Box>
             </Modal>
         </div>

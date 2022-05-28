@@ -24,10 +24,10 @@ const CreateAds = ({ handleClose, adsAlert }) => {
 
     const [ loading, setLoading ] = useState(false)
     const [ values, setValues ] = useState({
-        image_url: '', external_url: '', 
+        image_url: '', external_url: '', title: ''
     })
     const [ errors, setErrors ] = useState({
-        image_url: '', external_url: '',
+        image_url: '', external_url: '', title: ''
     })
     const [ imagePreview, setImagePreview ] = useState(null)
     const [ imageFile, setImageFile ] = useState(null)
@@ -53,8 +53,8 @@ const CreateAds = ({ handleClose, adsAlert }) => {
             setLoading(false)
         },
         onCompleted: () => {
-            setValues({ image_url: '', external_url: '', })
-            setErrors({ image_url: '', external_url: '', })
+            setValues({ image_url: '', external_url: '', title: '' })
+            setErrors({ image_url: '', external_url: '', title: '' })
             setImageFile('')
             setImagePreview('')
             setLoading(false)
@@ -82,7 +82,7 @@ const CreateAds = ({ handleClose, adsAlert }) => {
 
     const handleCreate = async () => {
         setLoading(true)
-        setErrors({ image_url: '', external_url: '', })
+        setErrors({ image_url: '', external_url: '', title: '' })
         let isErrorExit = false
         let errorObject = {}
         if(!values.image_url || !imageFile) {
@@ -130,6 +130,14 @@ const CreateAds = ({ handleClose, adsAlert }) => {
                                 error={errors.image_url? true: false}
                                 helperText={errors.image_url}
                                 type="file" accept="image/png, image/jpeg, image/jpg, image/gif, image/svg+xml"
+                            />
+                        </FormControl>
+                        <FormControl sx={{ m: 2 }} variant="outlined">
+                            <TextField id="title" label="Title"
+                                value={values.title}
+                                onChange={handleChange('title')}
+                                error={errors.title? true: false}
+                                helperText={errors.title}
                             />
                         </FormControl>
                         <FormControl sx={{ m: 2 }} variant="outlined">

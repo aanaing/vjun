@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react"
 import { Link, useNavigate } from 'react-router-dom'
 import { 
   Box, Breadcrumbs, Typography, Card, CardMedia, CardContent, Button, Modal, TablePagination, TableContainer, Table, TableHead,
-  TableBody, TableRow, TableCell, TextField, FormControl, Avatar
+  TableBody, TableRow, TableCell, TextField, FormControl, Avatar, IconButton
 } from '@mui/material'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { useLazyQuery } from '@apollo/client'
 import { PRODUCTS } from '../../gql/products'
@@ -34,6 +36,8 @@ const Index = () => {
   const [ offset, setOffset ] = useState(0)
   const [ products, setProducts ] = useState(null)
   const [ search, setSearch ] = useState('')
+  const [ sortingCreatedAt, setSortingCreatedAt ] = useState('asc')
+  const [ sortingAmount, setSortingAmount ] = useState(null)
 
   const [ loadProducts, result ] = useLazyQuery(PRODUCTS)
 
@@ -44,8 +48,8 @@ const Index = () => {
   };
 
   useEffect(() => {
-    loadProducts({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%` }})
-  }, [loadProducts, offset, rowsPerPage, search])
+    loadProducts({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, sorting_created_at: sortingCreatedAt, amount: sortingAmount }})
+  }, [loadProducts, offset, rowsPerPage, search, sortingCreatedAt, sortingAmount])
 
   useEffect(() => {
     if( result.data) {
@@ -72,6 +76,21 @@ const Index = () => {
     )
   }
 
+  const alterSorting = (property, sort) => {
+    switch (property) {
+      case 'created_at':
+        setSortingCreatedAt((sortingCreatedAt==='asc' || sortingCreatedAt === null) ? 'desc': 'asc')
+        setSortingAmount(null)
+        break;
+      case 'amount':
+        setSortingAmount((sortingAmount==='asc' || sortingAmount === null) ? 'desc': 'asc')
+        setSortingCreatedAt(null)
+        break;
+      default:
+        break;
+    }
+  }
+
   const detailProdcut = (product) => {
     navigate(`/product/${product.id}`)
   }
@@ -91,7 +110,7 @@ const Index = () => {
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} >
       <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>{open? 'Close' : 'New Product'}</Button>
       <FormControl sx={{ width: 300 }} >
-        <TextField id="outlined-search" label="Search by Name" type="search" 
+        <TextField id="outlined-search" label="Search by Name or Barcode" type="search" 
           value={search}
           onChange={(e) => { setSearch(e.target.value) }}
         />
@@ -127,13 +146,23 @@ const Index = () => {
                 Price
               </TableCell>
               <TableCell style={{ minWidth: 70 }}>
+                Barcode
+              </TableCell>
+              <TableCell style={{ minWidth: 70 }}>
                 Sold Amount
+                <IconButton onClick={() => alterSorting('amount')} color={ !sortingAmount? 'default': 'primary' } sx={{ ml: 1 }} size="small" component="span">
+                  {
+                    (sortingAmount === 'asc') ? <ArrowDownwardIcon /> : <ArrowUpwardIcon />
+                  }
+                </IconButton>
               </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Created At
-              </TableCell>
-              <TableCell style={{ minWidth: 70 }}>
-                Updated At
+                <IconButton onClick={() => alterSorting('created_at')} color={ !sortingCreatedAt? 'default': 'primary' } sx={{ ml: 1 }} size="small" component="span">
+                  {
+                    (sortingCreatedAt === 'asc') ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />
+                  }
+                </IconButton>
               </TableCell>
               <TableCell style={{ minWidth: 50 }}>
                 Detail
@@ -161,13 +190,13 @@ const Index = () => {
                       {row.price}
                     </TableCell>
                     <TableCell >
-                      {row.amount}
+                      {row.barcode}
+                    </TableCell>
+                    <TableCell >
+                      {row.sold_amount}
                     </TableCell>
                     <TableCell >
                       {row.created_at.substring(0, 10)}
-                    </TableCell>
-                    <TableCell >
-                      {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
                       <Button size="small" color="secondary" onClick={() => detailProdcut(row)}>Detail</Button>

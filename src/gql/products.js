@@ -1,15 +1,17 @@
 import { gql } from '@apollo/client'
 
 export const PRODUCTS = gql`
-    query Products ($limit: Int!, $offset: Int!, $search: String) {
-        products(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {name: {_ilike: $search}}) {
+    query Products ($limit: Int!, $offset: Int!, $search: String, $sorting_created_at: order_by, $amount: order_by) {
+        products(limit: $limit, offset: $offset, order_by: { created_at: $sorting_created_at, sold_amount: $amount }, where: {_or:[ {name: {_ilike: $search}},{ barcode: {_ilike: $search}}]}) {
             created_at
             description
             id
             name
             price
+            sold_amount
             product_image_url
             updated_at
+            barcode
             category {
                 id
                 product_category_name
@@ -18,7 +20,7 @@ export const PRODUCTS = gql`
                 name
             }
         }
-        products_aggregate(where: {name: {_ilike: $search}}) {
+        products_aggregate(where: {_or:[ {name: {_ilike: $search}},{ barcode: {_ilike: $search}}]}) {
             aggregate {
               count
             }

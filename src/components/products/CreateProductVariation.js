@@ -20,6 +20,14 @@ const fileTypes = [
     "image/x-icon"
 ];
 
+let colors = [
+    { label: 'Red', value: 'Red' },
+    { label: 'Green', value: 'Green' },
+    { label: 'Blue', value: 'Blue' },
+    { label: 'White', value: 'White' },
+    { label: 'Skyblue', value: 'Skyblue' },
+]
+
 const CreateProductVariation = ({ product_id, handleClose }) => {
 
     const [ loading, setLoading ] = useState(false)
@@ -180,8 +188,11 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
                             onChange={handleChange('color')}
                             error={errors.color? true:false}
                           >
-                            <MenuItem value='Red' >Red</MenuItem>
-                            <MenuItem value='Green' >Green</MenuItem>
+                            {
+                                colors.map((color, index) => (
+                                    <MenuItem value={ color.value } key={index} >{ color.label }</MenuItem>
+                                ))
+                            }
                           </Select>
                           {
                             errors.review && <FormHelperText error >{errors.review}</FormHelperText>

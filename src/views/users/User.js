@@ -6,6 +6,7 @@ import { USER, UPDATE_USER, UPDATE_MEMBER_TIRE, UPDATE_POINT } from '../../gql/u
 import { Breadcrumbs, Typography, Box, Paper, Card, CardHeader, CardContent, CardMedia, ListItem, ListItemText,
   CardActions, Button, Alert, FormControl, MenuItem, InputLabel, Select, TextField
 } from '@mui/material'
+import AddressTable from '../../components/users/AddressTable'
 
 let timeId  = null
 
@@ -245,6 +246,7 @@ const User = () => {
                       </CardActions>
                   </Card>
               </Paper>
+              <AddressTable addresses={user.addresses} />
           </Box>
           {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

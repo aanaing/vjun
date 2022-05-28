@@ -52,8 +52,8 @@ mutation Delete_Category ($id: uuid!, $image_name: String!) {
 `
 
 export const UPDATE_POSITION = gql`
-mutation Update_Category ($id: uuid!, $updater: Boolean!) {
-  update_product_categories_by_pk(pk_columns: {id: $id}, _set: {updated_at_updater: $updater}) {
+mutation Update_Category ($id: uuid!, $updateAt: timestamptz!) {
+  update_product_categories_by_pk(pk_columns: {id: $id}, _set: {updated_at: $updateAt}) {
     device_type
     id
     product_category_image_url

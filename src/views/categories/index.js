@@ -63,7 +63,7 @@ const Index = () => {
     }
   })
 
-  const [ updateOpsition ] = useMutation(UPDATE_POSITION, {
+  const [ updatePosition ] = useMutation(UPDATE_POSITION, {
     onError: (error) => {
       console.log('error: ', error)
     },
@@ -207,7 +207,7 @@ const Index = () => {
                       {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                      <Button color="secondary" onClick={() => updateOpsition({ variables: { id: row.id, updater: !row.updated_at_updater } })}>Put to Top</Button>
+                      <Button color="secondary" onClick={() => updatePosition({ variables: { id: row.id, updateAt: new Date().toISOString() } })}>Put to Top</Button>
                       <Button color="primary" onClick={() => handleOpenE(row)}>Edit</Button>
                       <Button color="error" onClick={() => handleOpenD(row)} >Remove</Button>
                     </TableCell>

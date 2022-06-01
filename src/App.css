@@ -136,6 +136,9 @@ thead .MuiTableCell-root:last-child {
 .card-bg-4 {
     background-image: url('./static/order.png');
 }
+.card-bg-5 {
+    background-image: url('./static/order.png');
+}
 
 .order-card-1 {
     background: linear-gradient(98.86deg, #6BAAFC 0%, #305FEC 100%);
@@ -151,6 +154,10 @@ thead .MuiTableCell-root:last-child {
 
 .order-card-4 {
     background: linear-gradient(98.86deg, #F2CB6C 0%, #FFB402 100%);
+}
+
+.order-card-5 {
+    background: linear-gradient(98.86deg, #90f26c 0%, #02ff20 100%);
 }
 
 .tag-container .MuiBox-root {

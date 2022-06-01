@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Box, FormControl, TextField, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TablePagination,
-Button, FormHelperText,
+Button, FormHelperText
 } from '@mui/material'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
@@ -8,7 +8,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useLazyQuery } from '@apollo/client'
 import { ORDERS, ORDERSWITHDATE } from '../../gql/orders'
 
-const Pending = ({ detailOrder }) => {
+const Reject = ({ detailOrder }) => {
 
     const [ search, setSearch ] = useState('')
     const [ count, setCount ] = useState(0)
@@ -30,9 +30,9 @@ const Pending = ({ detailOrder }) => {
           setDateError('Date From must be smaller than Date To!')
           return
         }
-        loadOrdersWithDate({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%pending%', start: startDate, end: endDate }})
+        loadOrdersWithDate({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%reject%', start: startDate, end: endDate }})
       } else {
-        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%pending%'}})
+        loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%reject%'}})
       }
     }, [endDate, loadOrders, loadOrdersWithDate, offset, rowsPerPage, search, startDate])
 
@@ -71,7 +71,7 @@ const Pending = ({ detailOrder }) => {
     }
 
     return (
-    <div>
+        <div>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', my: 2 }} >
           <FormControl sx={{ width: 300 }} >
             <TextField id="outlined-search" label="Search by User's name" type="search" 
@@ -147,7 +147,7 @@ const Pending = ({ detailOrder }) => {
                   <TableCell style={{ minWidth: 70 }} >
                     Created At
                   </TableCell>
-                  <TableCell style={{ minWidth: 70 }}>
+                  <TableCell style={{ minWidth: 70 }} >
                     Action
                   </TableCell>
               </TableRow>
@@ -193,8 +193,8 @@ const Pending = ({ detailOrder }) => {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Box>
-    </div>
+        </div>
     )
 }
 
-export default Pending
+export default Reject

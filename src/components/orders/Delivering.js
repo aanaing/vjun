@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Box, FormControl, TextField, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TablePagination,
-Button, FormHelperText, Alert
+Button, FormHelperText
 } from '@mui/material'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { useLazyQuery, useMutation } from '@apollo/client'
-import { ORDERS, ORDERSWITHDATE, UPDATE_ORDER_STATUS } from '../../gql/orders'
+import { useLazyQuery } from '@apollo/client'
+import { ORDERS, ORDERSWITHDATE } from '../../gql/orders'
 
 const Delivering = ({ detailOrder }) => {
 
@@ -16,7 +16,6 @@ const Delivering = ({ detailOrder }) => {
     const [ rowsPerPage, setRowsPerPage ] = useState(10)
     const [ offset, setOffset ] = useState(0)
     const [ orders, setOrders ] = useState(null)
-    const [ showAlert, setShowAlert ] = useState({ message: '', isError: false })
 
     const [ startDate, setStartDate] = useState(null)
     const [ dateError, setDateError ] = useState('')
@@ -52,19 +51,6 @@ const Delivering = ({ detailOrder }) => {
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [result ])
-
-    const [ updateStatus ] = useMutation(UPDATE_ORDER_STATUS, {
-      onError: (error) => {
-        console.log('error : ', error)
-      },
-      onCompleted: (r) => {
-        setShowAlert({ message: `Order's status have been changed to ${r.update_user_order_by_pk.order_status}`, isError: false })
-        setTimeout(() => {
-            setShowAlert({ message: '', isError: false })
-        }, 2000)
-        result.refetch()
-      },
-    })
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -190,9 +176,6 @@ const Delivering = ({ detailOrder }) => {
                     </TableCell>
                     <TableCell>
                       <Button color="secondary" size="small" onClick={() => detailOrder(row)}>Detail</Button>
-                      <Button size='small' variant="contained" color="success" onClick={() => {
-                        updateStatus({ variables: { id: row.id, status: 'completed'} })
-                      }}>Completed</Button>
                     </TableCell>
                   </TableRow>
                 ))
@@ -210,12 +193,6 @@ const Delivering = ({ detailOrder }) => {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Box>
-        {
-          (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: 10 }} severity="success">{showAlert.message}</Alert>
-        }
-        {
-          (showAlert.message && showAlert.isError) && <Alert sx={{ position: 'fixed', bottom: '1em', right: '1em', zIndex: 10 }} severity="warning">{showAlert.message}</Alert>
-        }
       </div>
     )
 }

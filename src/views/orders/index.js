@@ -8,6 +8,8 @@ import PaymentVerified from "../../components/orders/PaymentVerified"
 import Delivering from "../../components/orders/Delivering"
 import Completed from "../../components/orders/Completed"
 import Cancelled from '../../components/orders/Cancelled'
+import Reject from '../../components/orders/Reject'
+import All from '../../components/orders/All'
 import PropTypes from 'prop-types';
 
 import { useQuery } from '@apollo/client'
@@ -80,26 +82,32 @@ const Index = () => {
             <Typography variant='h4' component='h2' sx={{ my: 2, fontWeight: 'bold' }} >Orders</Typography>
           </Box>
         </div>
-        <Box sx={{ my: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 130 }}>
-          <Card className="order-card order-card-1" sx={{ flex: 1, minHeight: '100%', color: 'white', mr: 2 }}>
-            <div className="card-bg-hover card-bg-1"></div>
-            <Typography variant='h6' component='h4' sx={{ my: 1, mx: 2, zIndex: 2 }} >All Orders</Typography>
-            <Typography variant='h2' component='h1' sx={{ my: 1, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.all.aggregate.count}</Typography>
-          </Card>
+        <Box sx={{ my: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 100 }}>
+          
           <Card className="order-card order-card-2" sx={{ flex: 1, minHeight: '100%', color: 'white', mr: 2 }}>
             <div className="card-bg-hover card-bg-2"></div>
-            <Typography variant='h6' component='h4' sx={{ my: 1, mx: 2, zIndex: 2 }} >Pending</Typography>
-            <Typography variant='h2' component='h1' sx={{ my: 1, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.pending.aggregate.count}</Typography>
+            <Typography variant='h6' component='h4' sx={{ my: 0, mx: 2, zIndex: 2 }} >Pending</Typography>
+            <Typography variant='h2' component='h1' sx={{ my: 0, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.pending.aggregate.count}</Typography>
           </Card>
           <Card className="order-card order-card-3" sx={{ flex: 1, minHeight: '100%', color: 'white', mr: 2 }}>
             <div className="card-bg-hover card-bg-3"></div>
-            <Typography variant='h6' component='h4' sx={{ my: 1, mx: 2, zIndex: 2 }} >Payment Verified</Typography>
-            <Typography variant='h2' component='h1' sx={{ my: 1, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.verified.aggregate.count}</Typography>
+            <Typography variant='h6' component='h4' sx={{ my: 0, mx: 2, zIndex: 2 }} >Payment Verified</Typography>
+            <Typography variant='h2' component='h1' sx={{ my: 0, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.verified.aggregate.count}</Typography>
           </Card>
-          <Card className="order-card order-card-4" sx={{ flex: 1, minHeight: '100%', color: 'white' }}>
+          <Card className="order-card order-card-4" sx={{ flex: 1, minHeight: '100%', color: 'white',  mr: 2 }}>
             <div className="card-bg-hover card-bg-4"></div>
-            <Typography variant='h6' component='h4' sx={{ my: 1, mx: 2, zIndex: 2 }} >Delivering</Typography>
-            <Typography variant='h2' component='h1' sx={{ my: 1, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.delivering.aggregate.count}</Typography>
+            <Typography variant='h6' component='h4' sx={{ my: 0, mx: 2, zIndex: 2 }} >Delivering</Typography>
+            <Typography variant='h2' component='h1' sx={{ my: 0, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.delivering.aggregate.count}</Typography>
+          </Card>
+          <Card className="order-card order-card-5" sx={{ flex: 1, minHeight: '100%', color: 'white',  mr: 2 }}>
+            <div className="card-bg-hover card-bg-5"></div>
+            <Typography variant='h6' component='h4' sx={{ my: 0, mx: 2, zIndex: 2 }} >Completed Order</Typography>
+            <Typography variant='h2' component='h1' sx={{ my: 0, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.completed.aggregate.count}</Typography>
+          </Card>
+          <Card className="order-card order-card-1" sx={{ flex: 1, minHeight: '100%', color: 'white' }}>
+            <div className="card-bg-hover card-bg-1"></div>
+            <Typography variant='h6' component='h4' sx={{ my: 0, mx: 2, zIndex: 2 }} >All Orders</Typography>
+            <Typography variant='h2' component='h1' sx={{ my: 0, mx: 2, textAlign: 'end', fontWeight: 'bolder', zIndex: 2 }} >{counts.all.aggregate.count}</Typography>
           </Card>
         </Box>
         <Box className="tag-container" sx={{ width: '100%' }}>
@@ -110,6 +118,8 @@ const Index = () => {
               <Tab label="Delivering" id='tab-delivering' aria-controls='tabpanel-delivering' />
               <Tab label="Completed" id='tab-completed' aria-controls='tabpanel-completed' />
               <Tab label="Cancelled" id='tab-cancelled' aria-controls='tabpanel-cancelled' />
+              <Tab label="Rejected" id='tab-reject' aria-controls='tabpanel-reject' />
+              <Tab label="All Orders" id='tab-all' aria-controls='tabpanel-all' />
             </Tabs>
           </Box>
           <TabPanel value={value} index={0}>
@@ -126,6 +136,12 @@ const Index = () => {
           </TabPanel>
           <TabPanel value={value} index={4}>
             <Cancelled detailOrder={detailOrder} />
+          </TabPanel>
+          <TabPanel value={value} index={5}>
+            <Reject detailOrder={detailOrder} />
+          </TabPanel>
+          <TabPanel value={value} index={6}>
+            <All detailOrder={detailOrder} />
           </TabPanel>
         </Box>
     </div>

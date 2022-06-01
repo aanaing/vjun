@@ -200,12 +200,31 @@ const Order = () => {
                           </Box>
                       </CardContent>
                       <CardActions sx={{ justifyContent: 'flex-end' }}>
-                        <Button variant="contained" color="warning" onClick={() => {
-                          updateStatus({ variables: { id: order.id, status: 'reject'} })
-                        }}>Reject</Button>
-                        <Button variant="contained" color="error" onClick={handleOpen} >
-                          Cancel
-                        </Button>
+                        {
+                          order.order_status?.includes('pending') && <Button variant="contained" color="info" onClick={() => {
+                            updateStatus({ variables: { id: order.id, status: 'verified'} })
+                          }}>Verifie</Button>
+                        }
+                        {
+                          order.order_status?.includes('verified') && <Button variant="contained" color="info" onClick={() => {
+                            updateStatus({ variables: { id: order.id, status: 'delivering'} })
+                          }}>Delivering</Button>
+                        }
+                        {
+                          order.order_status?.includes('delivering') && <Button variant="contained" color="info" onClick={() => {
+                            updateStatus({ variables: { id: order.id, status: 'completed'} })
+                          }}>Completed</Button>
+                        }
+                        {
+                          !(order.order_status.includes('reject')) && <Button variant="contained" color="warning" onClick={() => {
+                            updateStatus({ variables: { id: order.id, status: 'reject'} })
+                          }}>Reject</Button>
+                        }
+                        {
+                          !(order.order_status.includes('cancelled')) && <Button variant="contained" color="error" onClick={handleOpen} >
+                            Cancel
+                          </Button>
+                        }
                       </CardActions>
                   </Box>
                   <Modal

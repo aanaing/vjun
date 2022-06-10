@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { Box, FormControl, TextField, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TablePagination,
-Button, FormHelperText
+Button, FormHelperText, Tooltip
 } from '@mui/material'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { useLazyQuery } from '@apollo/client'
 import { ORDERS, ORDERSWITHDATE } from '../../gql/orders'
+
+import { CSVLink } from 'react-csv'
+
+const headers = [
+  { label: "ID", key: "id" },
+  { label: "User Name", key: "username" },
+  { label: "Total Price", key: "total_price" },
+  { label: "Total Quantity", key: "total_quantity" },
+  { label: "Updated At", key: "updated_at" },
+  { label: "Created At", key: "created_at" },
+  { label: "Status", key: 'status' },
+];
+
+let data = []
 
 const All = ({ detailOrder }) => {
 
@@ -20,6 +34,8 @@ const All = ({ detailOrder }) => {
     const [ startDate, setStartDate] = useState(null)
     const [ dateError, setDateError ] = useState('')
     const [ endDate, setEndDate ] = useState(new Date())
+
+    const [ showExport, setShowExport ] = useState(false)
 
     const [ loadOrders, result ] = useLazyQuery(ORDERS)
     const [ loadOrdersWithDate, resultWithDate ] = useLazyQuery(ORDERSWITHDATE)
@@ -38,16 +54,27 @@ const All = ({ detailOrder }) => {
 
     useEffect(() => {
         if(result.data) {
-        setOrders(result.data.user_order)
-        setCount(Number(result.data?.user_order_aggregate.aggregate.count))
+          setOrders(result.data.user_order)
+          setCount(Number(result.data?.user_order_aggregate.aggregate.count))
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [result ])
+    }, [result])
 
     useEffect(() => {
       if(resultWithDate.data) {
         setOrders(resultWithDate.data.user_order)
         setCount(Number(resultWithDate.data?.user_order_aggregate.aggregate.count))
+        let tempData = resultWithDate.data.user_order
+        let temp = tempData?.map(d => {
+          return { 
+            id: d.id, username: d.user.name, total_price: d.total_price, total_quantity: d.total_quantity,
+            updated_at: d.updated_at.substring(0, 10),
+            created_at: d.created_at.substring(0, 10),
+            status: d.order_status
+          }
+        })
+        data = temp
+        setShowExport(true)
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [result ])
@@ -147,6 +174,9 @@ const All = ({ detailOrder }) => {
                   <TableCell style={{ minWidth: 70 }} >
                     Created At
                   </TableCell>
+                  <TableCell style={{ minWidth: 70 }}>
+                    Status
+                  </TableCell>
                   <TableCell style={{ minWidth: 70 }} >
                     Action
                   </TableCell>
@@ -169,10 +199,13 @@ const All = ({ detailOrder }) => {
                       {row.total_quantity}
                     </TableCell>
                     <TableCell >
-                      {row.created_at.substring(0, 10)}
+                      {row.updated_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                      {row.updated_at.substring(0, 10)}
+                      {row.created_at.substring(0, 10)}
+                    </TableCell>
+                    <TableCell>
+                      {row.order_status}
                     </TableCell>
                     <TableCell>
                       <Button color="secondary" size="small" onClick={() => detailOrder(row)}>Detail</Button>
@@ -183,15 +216,27 @@ const All = ({ detailOrder }) => {
             </TableBody>
           </Table>
         </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[ 10, 25, 100]}
-            component="div"
-            count={count}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+        </Box>
+        <TablePagination
+          rowsPerPageOptions={[ 10, 25, 100]}
+          component="div"
+          count={count}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          {
+            showExport &&  
+            <Tooltip title="Download CSV file which contains all data show in the table" placement='left' arrow>
+              <Button>
+                <CSVLink className='exportBtn' data={data} headers={headers} filename={`all-orders-${new Date().toISOString()}.csv`} >
+                  Export
+                </CSVLink>
+              </Button>
+            </Tooltip>
+          }
         </Box>
         </div>
     )

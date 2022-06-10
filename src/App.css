@@ -198,3 +198,7 @@ thead .MuiTableCell-root:last-child {
     background-color: transparent;
     color: #1b5e20;
 }
+
+.exportBtn {
+    text-decoration: none;
+}

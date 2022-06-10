@@ -27,8 +27,8 @@
 }
 
 .RichTextEditor__root___2QXK- {
-    max-width: 500px;
-    height: 500px;
+    /* max-width: 350px; */
+    height: 350px;
 }
 
 .nav-list {
@@ -173,6 +173,9 @@ thead .MuiTableCell-root:last-child {
     border-radius: 10px;
     height: 380px;
     object-fit: contain !important;
+}
+
+.order-card-media {
     box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12) !important;
 }
 

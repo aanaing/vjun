@@ -67,11 +67,11 @@ query Products_by_pk($id: uuid!) {
 export const PRODUCT_VARIATIONS = gql`
     query Product_variations($product_id: uuid!) {
         product_variations(where: {fk_product_id: {_eq: $product_id}}) {
+            color
             created_at
-            fk_product_id
             id
             price
-            updated_at
+            sold_amount
             variation_image_url
             variation_name
         }
@@ -81,13 +81,13 @@ export const PRODUCT_VARIATIONS = gql`
 export const PRODUCT_VARIATIONS_BY_PK = gql`
     query Product_variations_by_pk($id: ID!) {
         product_variations_by_pk(id: $id) {
-        created_at
-        fk_product_id
-        id
-        price
-        updated_at
-        variation_image_url
-        variation_name
+            color
+            created_at
+            id
+            price
+            sold_amount
+            variation_image_url
+            variation_name
         }
     }
 `
@@ -113,13 +113,13 @@ export const CREATE_PRODUCT = gql`
 export const CREATE_PRODUCT_VARIATION = gql`
 mutation Insert_Product_Variations_One($name: String!, $image_url: String!, $price: numeric!, $product_id: uuid!, $color: String) {
     insert_product_variations_one(object: {fk_product_id: $product_id, price: $price, variation_image_url: $image_url, variation_name: $name, color: $color}) {
-      created_at
-      fk_product_id
-      id
-      price
-      updated_at
-      variation_image_url
-      variation_name
+        color
+        created_at
+        id
+        price
+        sold_amount
+        variation_image_url
+        variation_name
     }
 }
 `

@@ -5,6 +5,7 @@ import { UPDATE_PRODUCT_VARIATION } from '../../gql/products'
 import imageService from '../../services/image'
 
 import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button, InputLabel, MenuItem, Select, FormHelperText  } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -19,6 +20,14 @@ const fileTypes = [
     "image/webp",
     "image/x-icon"
 ];
+
+let colors = [
+    { label: 'Red', value: 'Red' },
+    { label: 'Green', value: 'Green' },
+    { label: 'Blue', value: 'Blue' },
+    { label: 'White', value: 'White' },
+    { label: 'Skyblue', value: 'Skyblue' },
+]
 
 const UpdateProductVariation = ({ product_id, handleClose, product, variationAlert }) => {
 
@@ -150,7 +159,7 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
         <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
                 <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Update Product Variation</Typography>
-                <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
+                <Button onClick={handleClose} variant="contained" sx={{ height: 40, minWidth: 'auto', width: 40, borderRadius: '50%', bgcolor: 'black' }}><CloseIcon /></Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
                 <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
@@ -158,7 +167,7 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
                         component="img"
                         image={imagePreview}
                         alt="Product"
-                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                        sx={{ bgcolor: '#cecece', height: '300px', objectFit: 'contain', borderRadius: '10px', padding: 1 }}
                     />
                     <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
                 </Box>
@@ -189,8 +198,11 @@ const UpdateProductVariation = ({ product_id, handleClose, product, variationAle
                             onChange={handleChange('color')}
                             error={errors.color? true:false}
                           >
-                            <MenuItem value='Red' >Red</MenuItem>
-                            <MenuItem value='Green' >Green</MenuItem>
+                            {
+                                colors.map((color, index) => (
+                                    <MenuItem value={ color.value } key={index} >{ color.label }</MenuItem>
+                                ))
+                            }
                           </Select>
                           {
                             errors.review && <FormHelperText error >{errors.review}</FormHelperText>

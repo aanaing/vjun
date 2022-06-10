@@ -40,7 +40,7 @@ const styleU = {
   p: 4,
 };
 
-export default function ProductVariationTable({ variationsProp }) {
+export default function ProductVariationTable({ variationsProp, refresh }) {
   const [ variations, setVariations ] = useState(null)
   const [ showAlert, setShowAlert ] = React.useState({ message: '', isError: false });
   const [ id, setId ] = useState('')
@@ -67,6 +67,7 @@ export default function ProductVariationTable({ variationsProp }) {
         setShowAlert({ message: '', isError: false })
       }, 3000)
       setId('')
+      refresh()
     },
     refetchQueries: [{ query: PRODUCT_VARIATIONS }]
   })
@@ -92,6 +93,7 @@ export default function ProductVariationTable({ variationsProp }) {
     setOpenU(true)
   };
   const handleCloseU = () => {
+    refresh()
     setOpenU(false)
   };
 
@@ -118,31 +120,13 @@ export default function ProductVariationTable({ variationsProp }) {
                   Color
                 </TableCell>
                 <TableCell style={{ minWidth: 70 }}>
-                  Collection
-                </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
-                  Material
-                </TableCell>
-                <TableCell style={{ minWidth: 170 }}>
-                  Description
-                </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
                   Price
                 </TableCell>
                 <TableCell style={{ minWidth: 70 }}>
-                  Facebook
-                </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
-                  Tiktok
-                </TableCell>
-                <TableCell style={{ minWidth: 70 }}>
-                  Instagram
+                  Sold Amount
                 </TableCell>
                 <TableCell style={{ minWidth: 50 }}>
                   Created At
-                </TableCell>
-                <TableCell style={{ minWidth: 50 }}>
-                  Updated At
                 </TableCell>
                 <TableCell style={{ minWidth: 170 }}>
                   Action
@@ -164,38 +148,20 @@ export default function ProductVariationTable({ variationsProp }) {
                        {row.variation_name}
                     </TableCell>
                     <TableCell >
-                       {row.variation_name}
-                    </TableCell>
-                    <TableCell >
-                       {row.variation_name}
-                    </TableCell>
-                    <TableCell >
-                       {row.variation_name}
-                    </TableCell>
-                    <TableCell >
-                       {row.variation_name}
+                       {row.color}
                     </TableCell>
                     <TableCell >
                        {row.price}
                     </TableCell>
                     <TableCell >
-                       {row.variation_name}
-                    </TableCell>
-                    <TableCell >
-                       {row.variation_name}
-                    </TableCell>
-                    <TableCell >
-                       {row.variation_name}
+                       {row.sold_amount}
                     </TableCell>
                     <TableCell >
                       {row.created_at.substring(0, 10)}
                     </TableCell>
                     <TableCell >
-                      {row.updated_at.substring(0, 10)}
-                    </TableCell>
-                    <TableCell >
-                      <Button color="primary" onClick={ () => handleOpenU(row) } >Edit</Button>
-                      <Button color="error" onClick={() => handleOpen(row.id)}>Remove</Button>
+                      <Button color="primary" sx={{ mr: 1}} variant="contained" onClick={ () => handleOpenU(row) } >Edit</Button>
+                      <Button color="error" variant="contained" onClick={() => handleOpen(row.id)}>Remove</Button>
                     </TableCell>
                   </TableRow>
                 );

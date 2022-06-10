@@ -109,7 +109,7 @@ const Order = () => {
                             height="194"
                             image={order.payment_screenshot_image_url}
                             alt="Payment screenshot"
-                            className="card-media"
+                            className="card-media order-card-media"
                           />
                         }
                           <Box sx={{flex: 4, mx: 3, display: 'flex', justifyContent: 'space-between' }}>

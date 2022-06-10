@@ -133,14 +133,17 @@ const Index = () => {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell style={{ minWidth: 170 }}>
-                ID
+              <TableCell style={{ minWidth: 70 }}>
+                Name
               </TableCell>
               <TableCell style={{ minWidth: 60 }}>
                 Image
               </TableCell>
-              <TableCell style={{ minWidth: 70 }}>
-                Name
+              <TableCell style={{ mimWidth: 60 }}>
+                Category
+              </TableCell>
+              <TableCell style={{ mimWidth: 60 }}>
+                Brand
               </TableCell>
               <TableCell style={{ minWidth: 70 }}>
                 Price
@@ -165,7 +168,7 @@ const Index = () => {
                 </IconButton>
               </TableCell>
               <TableCell style={{ minWidth: 50 }}>
-                Detail
+                Action
               </TableCell>
             </TableRow>
           </TableHead>
@@ -174,7 +177,7 @@ const Index = () => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                     <TableCell >
-                      {row.id}
+                      {row.name}
                     </TableCell>
                     <TableCell>
                       <Avatar
@@ -183,8 +186,11 @@ const Index = () => {
                         sx={{ width: 56, height: 56 }}
                       >P</Avatar>
                     </TableCell>
-                    <TableCell >
-                      {row.name}
+                    <TableCell>
+                      {row.category?.product_category_name}
+                    </TableCell>
+                    <TableCell>
+                      {row.brand_name?.name}
                     </TableCell>
                     <TableCell >
                       {row.price}

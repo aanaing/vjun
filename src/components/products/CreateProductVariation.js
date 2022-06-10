@@ -5,6 +5,7 @@ import { GET_IMAGE_UPLOAD_URL } from '../../gql/misc'
 import { CREATE_PRODUCT_VARIATION } from '../../gql/products'
 
 import { Box, Card, CardContent, FormControl, TextField, CardMedia, Alert, Typography, Button, InputLabel, MenuItem, Select, FormHelperText } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
 
 const fileTypes = [
@@ -141,7 +142,7 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
         <div>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
                 <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Product Variation</Typography>
-                <Button onClick={handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
+                <Button onClick={handleClose} variant="contained" sx={{ height: 40, minWidth: 'auto', width: 40, borderRadius: '50%', bgcolor: 'black' }}><CloseIcon /></Button>
             </Box>
             <Card sx={{ display: 'flex', justifyContent: 'space-between', }}>
                 <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
@@ -149,7 +150,7 @@ const CreateProductVariation = ({ product_id, handleClose }) => {
                         component="img"
                         image={imagePreview}
                         alt="Product"
-                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain'}}
+                        sx={{ bgcolor: '#cecece', height: '300px', objectFit: 'contain', borderRadius: '10px', padding: 1 }}
                     />
                     <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
                 </Box>

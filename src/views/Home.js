@@ -24,6 +24,7 @@ const Ads = lazy(() => import('./Ads/index'))
 const ServerConfig = lazy(() => import('./server_config/index'))
 const BankingAccount = lazy(() => import('./banking_account/index'))
 const Claimeds = lazy(() => import('./claimed_history/index'))
+const Shops = lazy(() => import('./shops/index'))
 
 const drawerWidth = 340;
 
@@ -111,6 +112,7 @@ useEffect(() => {
                 <Route path='/loualty_product/:id' element={<LoyaltyProduct homeAlert={homeAlert} />} />
                 <Route path='/brands' element={<Brands />} />
                 <Route path='/ads' element={<Ads />} />
+                <Route path='/shops' element={ <Shops /> } />
                 <Route path='/server_config' element={ <ServerConfig /> } />
                 <Route path='/banking_accounts' element={ <BankingAccount /> } />
               </Routes>

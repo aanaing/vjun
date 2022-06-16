@@ -34,6 +34,11 @@ query Products_by_pk($id: uuid!) {
       category {
         product_category_name
       }
+      product_photos {
+        id
+        fk_product_id
+        product_image_url
+      }
       fk_product_category_id
       fk_brand_id
       created_at
@@ -178,4 +183,24 @@ mutation Update_Product_Variation_By_Id($id: uuid!, $color: String, $price: nume
         variation_name
     }
   }  
+`
+
+export const CREATE_PRODUCT_PHOTO = gql`
+mutation Insert_Product_Photos ($image_url: String!, $id: uuid!) {
+    insert_product_photos_one(object: {product_image_url: $image_url, fk_product_id: $id}) {
+      id
+    }
+  }
+`
+
+export const DELETE_PRODUCT_PHOTO = gql`
+mutation Delete_Product_Photos_By_Id ($image_name: String!, $id: uuid!) {
+    delete_product_photos_by_pk(id: $id) {
+      id
+    }
+    deleteImage(imageName: $image_name) {
+        error
+        message
+    }
+}
 `

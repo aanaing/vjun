@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Link } from 'react-router-dom'
 import { 
-  Box, Breadcrumbs, TablePagination, TableContainer, Table, TableHead,
+  Box, Breadcrumbs, TablePagination, TableContainer, Table, TableHead, Tooltip, Button, Typography,
   TableBody, TableRow, TableCell, TextField, FormControl, IconButton, FormHelperText
 } from '@mui/material'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
@@ -24,10 +24,7 @@ const headers = [
   { label: 'Created At', key: 'created_at' },
 ]
 
-const data = [
-  { id: '1', status: 'pending', point_used: '60', claimer: '124332442', loyalty_product: '5324242', created_at: '12-3-2022' },
-  { id: '2', status: 'pending', point_used: '70', claimer: '124332442', loyalty_product: '5324242', created_at: '12-3-2022' }
-]
+let data = []
 
 const Index = () => {
 
@@ -39,11 +36,11 @@ const Index = () => {
   const [ search, setSearch ] = useState('')
   const [ sortingCreatedAt, setSortingCreatedAt ] = useState('asc')
 
+  const [ showExport, setShowExport ] = useState(false)
+
   const [ startDate, setStartDate] = useState(null)
   const [ dateError, setDateError ] = useState('')
   const [ endDate, setEndDate ] = useState(new Date())
-  const [ csvBtnDisabled, setCsvBtnDisabled ] = useState(false)
-  const [ csvData, setCsvData ] = useState([])
 
   const [ loadHistories, result ] = useLazyQuery(CLAIM_HISTORIES)
   const [ loadHistoriesWithDate, resultWithDate ] = useLazyQuery(CLAIM_HISTORIESWITHDATE)
@@ -71,19 +68,20 @@ const Index = () => {
     if(resultWithDate.data) {
       setHistories(resultWithDate.data.claim_history)
       setCount(Number(resultWithDate.data?.claim_history_aggregate.aggregate.count))
-      setCsvBtnDisabled(true)
-      // let temp = resultWithDate.data.claim_history
-      // console.log(temp)
+      let tempData = resultWithDate.data.claim_history
+        let temp = tempData?.map(d => {
+          return { 
+            id: d.id, status: d.claim_status? 'true' : 'false',
+            point_used: d.loyalty_points_used, claimer: d.user.name,
+            loyalty_product: d.loyalty_product.name,
+            created_at: d.created_at.substring(0, 10),
+          }
+        })
+        data = temp
+        setShowExport(true)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultWithDate])
-
-  // useEffect(() => {
-  //   if(histories) {
-  //     setCsvData(histories.map((value) => return { 
-
-  //     } ))
-  //   }
-  // }, [csvBtnDisabled])
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -133,10 +131,6 @@ const Index = () => {
         />
       </FormControl>
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        {
-          (csvBtnDisabled && data) ? <CSVLink className="csv-btn" data={data} headers={headers} filename={`claimed-${new Date().toISOString()}.csv`} > Download CSV file </CSVLink>
-          : null
-        }
         <FormControl sx={{ mr: 2 }}>
             <LocalizationProvider dateAdapter={AdapterMoment}>
                 <DesktopDatePicker
@@ -171,6 +165,7 @@ const Index = () => {
         </FormControl>
       </Box>
     </Box>
+    <Typography>* When you select Date filter fields, you can export data as a <em>CVS file</em> by clicking <em>EXPORT button</em> at the bottom on table.</Typography>
     <Box
       sx={{
       display: 'flex',
@@ -219,7 +214,7 @@ const Index = () => {
                       {row.id}
                     </TableCell>
                     <TableCell >
-                      {row.claim_status}
+                      {row.claim_status ? 'true' : 'false'}
                     </TableCell>
                     <TableCell >
                       {row.loyalty_points_used}
@@ -249,6 +244,18 @@ const Index = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
     />
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+      {
+        showExport &&  
+        <Tooltip title="Download CSV file which contains all data show in the table" placement='left' arrow>
+          <Button>
+            <CSVLink className='exportBtn' data={data} headers={headers} filename={`claimed-histories-${new Date().toISOString()}.csv`} >
+              Export
+            </CSVLink>
+          </Button>
+        </Tooltip>
+      }
+    </Box>
   </div>
   )
 }

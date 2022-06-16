@@ -2,10 +2,11 @@ import { gql } from '@apollo/client'
 
 export const ORDERS = gql`
 query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!) {
-    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {order_status: {_ilike: $status}, user: {name: {_ilike: $search}}}}) {
+    user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {order_status: {_ilike: $status}, user: {name: {_ilike: $search}} }}) {
         created_at
         fk_user_id
         id
+        order_readable_id
         order_status
         payment_screenshot_image_url
         total_price
@@ -24,12 +25,33 @@ query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!) {
 }
 `
 
+export const ORDERSBYID = gql`
+query Orders ($search: Int!, $status: String!) {
+  user_order(where: {_and: {order_status: {_ilike: $status}, order_readable_id: {_eq: $search} } }) {
+      created_at
+      fk_user_id
+      id
+      order_readable_id
+      order_status
+      payment_screenshot_image_url
+      total_price
+      total_quantity
+      updated_at
+      user {
+        name
+        id
+      }
+  }
+}
+` 
+
 export const ORDERSWITHDATE = gql`
 query Orders ($limit: Int!, $offset: Int!, $search: String!, $status: String!, $start: timestamptz, $end: timestamptz) {
     user_order(limit: $limit, offset: $offset, order_by: {created_at: desc}, where: {_and: {order_status: {_ilike: $status},  _or: {user: {name: {_ilike: $search}}, created_at: {_gte: $start, _lt: $end}}}}) {
         created_at
         fk_user_id
         id
+        order_readable_id
         order_status
         payment_screenshot_image_url
         total_price
@@ -64,6 +86,7 @@ query Order_By_Pk ($id: uuid!) {
         created_at
         fk_user_id
         id
+        order_readable_id
         order_readable_id
         address
         order_status
@@ -106,6 +129,7 @@ query Order_Items($id: uuid!) {
       fk_product_variation_id
       fk_order_id
       id
+      order_readable_id
       quantity
       order_price_for_one_item
       created_at
@@ -127,6 +151,7 @@ export const UPDATE_ORDER_STATUS = gql`
 mutation Update_User_Order($id: uuid!, $status: String!) {
   update_user_order_by_pk(pk_columns: {id: $id}, _set: {order_status: $status}) {
     id
+    order_readable_id
     order_status
   }
 }

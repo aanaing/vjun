@@ -2,8 +2,6 @@ import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import SummarizeSharpIcon from '@mui/icons-material/SummarizeSharp';
@@ -16,7 +14,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import SettingsIcon from '@mui/icons-material/Settings';
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
-import AccessAlarmsTwoToneIcon from '@mui/icons-material/AccessAlarmsTwoTone';
+import StoreIcon from '@mui/icons-material/Store';
 
 import{ Box, Avatar } from '@mui/material'
 import logo from '../static/logo192.png'
@@ -123,6 +121,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
                         <BrokenImageIcon className='nav-link-icon'/>
                     </ListItemIcon>
                     Ads
+                </ListItem>
+            </Link>
+            <Link to="/shops" className='nav-link'>
+                <ListItem button className='nav-btn'>
+                    <ListItemIcon>
+                        <StoreIcon className='nav-link-icon'/>
+                    </ListItemIcon>
+                    Shops
                 </ListItem>
             </Link>
             <Link to="/server_config" className='nav-link'>

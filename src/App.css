@@ -29,6 +29,7 @@
 .RichTextEditor__root___2QXK- {
     /* max-width: 350px; */
     height: 350px;
+    overflow-y: scroll;
 }
 
 .nav-list {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
-import product from "../../services/image";
+import imageService from "../../services/image";
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_IMAGE_UPLOAD_URL, CATEGORIES, BRANDS, DELETE_IMAGE } from '../../gql/misc'
 import { UPDATE_PRODUCT } from '../../gql/products'
 
 import { Box, FormControl, TextField, Typography, CardMedia, Alert, Select, InputLabel, MenuItem, FormHelperText,
-    Button
+    Button,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import { LoadingButton } from '@mui/lab';
@@ -56,8 +56,7 @@ const UpdateProduct = (props) => {
     })
 
     const [ getImageUrl ] = useMutation(GET_IMAGE_UPLOAD_URL, {
-        onError: (error) => {
-            console.log('error : ', error)
+        onError: () => {
             setShowAlert({ message: 'Error on server', isError: true })
             setTimeout(() => {
                 setShowAlert({ message: '', isError: false })
@@ -176,7 +175,7 @@ const UpdateProduct = (props) => {
         }
         try {
             if(isImageChange) {
-                await product.uploadImage(imageFileUrl, imageFile)
+                await imageService.uploadImage(imageFileUrl, imageFile)
                 deleteImage({ variables: { image_name: oldImageName } })
             }
             updateProduct({variables: { ...values, id: props.product_id }})
@@ -200,18 +199,9 @@ const UpdateProduct = (props) => {
 
     return (
         <div>
-        {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
-            <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Update Product</Typography>
-            <Button onClick={props.handleClose} variant="outlined" sx={{ height: 50 }}>Close</Button>
-        </Box> */}
         <Box
             sx={{
             display: 'flex',
-            '& > :not(style)': {
-                m: 1,
-                width: '100%',
-                minHeight: '83vh',
-            },
             flexDirection: 'column'
             }}
         >
@@ -236,7 +226,7 @@ const UpdateProduct = (props) => {
                 </Box>
                 <Box sx={{ flex: 5, ml: 5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} >
-                        <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Create Product</Typography>
+                        <Typography variant='h4' component='h2' sx= {{ m: 3 }} >Update Product</Typography>
                         <Button onClick={props.handleClose} variant="contained" sx={{ height: 40, minWidth: 'auto', width: 40, borderRadius: '50%', bgcolor: 'black' }}><CloseIcon /></Button>
                     </Box>
                     <Box sx={{flex: 2}}>
@@ -357,142 +347,6 @@ const UpdateProduct = (props) => {
                     </Box>
                 </Box>
             </Box>
-            {/* <Card sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column' }} >
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Box sx={{ display: 'inline-flex', flexDirection: 'column', flex: 1, my: 5, mx: 2 }}>
-                    <CardMedia
-                        component="img"
-                        image={imagePreview}
-                        alt="Product"
-                        sx={{flex: 1, bgcolor: '#cecece', maxHeight: 300, objectFit: 'contain' }}
-                    />
-                    <Typography variant="span" component="div" >1024 * 1024 recommended</Typography>
-                </Box>
-                <CardContent sx={{flex: 3}}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column'}} >
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="name" label="Name"
-                                value={values.name}
-                                onChange={handleChange('name')}
-                                error={errors.name? true: false}
-                                helperText={errors.name}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="price" label="General Price"
-                                value={values.price}
-                                onChange={handleChange('price')}
-                                error={errors.price? true: false}
-                                helperText={errors.price}
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }}>
-                            <TextField id="image" placeholder="Upload image" InputLabelProps={{ shrink: true }} label="Upload Image"
-                                onChange={imageChange}
-                                error={errors.product_image_url? true: false}
-                                helperText={errors.product_image_url}
-                                type="file" accept="image/png, image/jpeg, image/jpg, image/gif, image/svg+xml"
-                            />
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="category">Category</InputLabel>
-                          <Select
-                            labelId="category"
-                            value={values.category}
-                            label="Category"
-                            onChange={handleChange('category')}
-                            error={errors.category? true:false}
-                          >
-                            {
-                                category_result.data.product_categories.map(c => (
-                                    <MenuItem key={c.id} value={c.id} >{c.product_category_name}</MenuItem>
-                                ))
-                            }
-                          </Select>
-                          {
-                            errors.category && <FormHelperText error >{errors.category}</FormHelperText>
-                          }
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="brand">Brand</InputLabel>
-                          <Select
-                            labelId="brand"
-                            value={values.brand}
-                            label="Brand"
-                            onChange={handleChange('brand')}
-                            error={errors.brand? true:false}
-                          >
-                            {
-                                brand_result.data.brand_name.map(b => (
-                                    <MenuItem key={b.id} value={b.id} >{b.name}</MenuItem>
-                                ))
-                            }
-                          </Select>
-                          {
-                            errors.brand && <FormHelperText error >{errors.brand}</FormHelperText>
-                          }
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="discount">Discount Eligible</InputLabel>
-                          <Select
-                            labelId="discount"
-                            value={values.discount}
-                            label="Discount Eligible"
-                            onChange={handleChange('discount')}
-                            error={errors.discount? true:false}
-                          >
-                            <MenuItem value={false} >False</MenuItem>
-                            <MenuItem selected value={true} >True</MenuItem>
-                          </Select>
-                          {
-                            errors.discount && <FormHelperText error >{errors.discount}</FormHelperText>
-                          }
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                          <InputLabel id="review">Show Review</InputLabel>
-                          <Select
-                            labelId="review"
-                            value={values.review}
-                            label="Show Review"
-                            onChange={handleChange('review')}
-                            error={errors.review? true:false}
-                          >
-                            <MenuItem value={false} >False</MenuItem>
-                            <MenuItem selected value={true} >True</MenuItem>
-                          </Select>
-                          {
-                            errors.review && <FormHelperText error >{errors.review}</FormHelperText>
-                          }
-                        </FormControl>
-                        <FormControl sx={{ m: 2 }} variant="outlined">
-                            <TextField id="barcode" label="Barcode"
-                                value={values.barcode}
-                                onChange={handleChange('barcode')}
-                                error={errors.barcode? true: false}
-                                helperText={errors.barcode}
-                            />
-                        </FormControl>
-                    </Box>
-                </CardContent>
-                <Box sx={{ my: 1 }}>
-                    <InputLabel>Description</InputLabel>
-                    <RichTextEditor style={{ height: '500px' }} value={textValue} onChange={onChange} toolbarConfig={toolbarConfig} />
-                    {
-                        errors.description && <FormHelperText error >{ errors.description }</FormHelperText>
-                    }
-                </Box>
-            </Box>
-                <FormControl sx={{ m: 2 }} variant="outlined">
-                    <LoadingButton
-                        variant="contained"
-                        loading={loading}
-                        onClick={handleUpdate}
-                        sx={{ backgroundColor: '#4b26d1', alignSelf: 'end' }}
-                    >
-                        Update
-                    </LoadingButton>
-                </FormControl>
-            </Card> */}
         </Box>
         {
             (showAlert.message && !showAlert.isError) && <Alert sx={{ position: 'absolute', bottom: '1em', right: '1em' }} severity="success">{showAlert.message}</Alert>

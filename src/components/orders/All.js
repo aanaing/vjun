@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Box, FormControl, TextField, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, TablePagination,
-Button, FormHelperText, Tooltip
+Button, FormHelperText, Tooltip, Typography
 } from '@mui/material'
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import { useLazyQuery } from '@apollo/client'
-import { ORDERS, ORDERSWITHDATE } from '../../gql/orders'
+import { ORDERS, ORDERSWITHDATE, ORDERSBYID } from '../../gql/orders'
 
 import { CSVLink } from 'react-csv'
 
@@ -38,9 +38,15 @@ const All = ({ detailOrder }) => {
     const [ showExport, setShowExport ] = useState(false)
 
     const [ loadOrders, result ] = useLazyQuery(ORDERS)
+    const [ loadOrderByID, resultByID ] = useLazyQuery(ORDERSBYID)
     const [ loadOrdersWithDate, resultWithDate ] = useLazyQuery(ORDERSWITHDATE)
 
     useEffect(() => {
+      if(search && !isNaN(search)) {
+        setStartDate(null)
+        loadOrderByID({ variables: { search: (search - 1 + 1), status: '%%'} })
+        return
+      }
       if(startDate && endDate) {
         if((startDate && endDate) && startDate > endDate) {
           setDateError('Date From must be smaller than Date To!')
@@ -50,7 +56,7 @@ const All = ({ detailOrder }) => {
       } else {
         loadOrders({ variables: { limit: rowsPerPage, offset: offset, search: `%${search}%`, status: '%%'}})
       }
-    }, [endDate, loadOrders, loadOrdersWithDate, offset, rowsPerPage, search, startDate])
+    }, [endDate, loadOrderByID, loadOrders, loadOrdersWithDate, offset, rowsPerPage, search, startDate])
 
     useEffect(() => {
         if(result.data) {
@@ -61,13 +67,13 @@ const All = ({ detailOrder }) => {
     }, [result])
 
     useEffect(() => {
-      if(resultWithDate.data) {
+      if(startDate && endDate && resultWithDate.data) {
         setOrders(resultWithDate.data.user_order)
         setCount(Number(resultWithDate.data?.user_order_aggregate.aggregate.count))
         let tempData = resultWithDate.data.user_order
         let temp = tempData?.map(d => {
           return { 
-            id: d.id, username: d.user.name, total_price: d.total_price, total_quantity: d.total_quantity,
+            id: d.order_readable_id, username: d.user.name, total_price: d.total_price, total_quantity: d.total_quantity,
             updated_at: d.updated_at.substring(0, 10),
             created_at: d.created_at.substring(0, 10),
             status: d.order_status
@@ -77,7 +83,15 @@ const All = ({ detailOrder }) => {
         setShowExport(true)
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [result ])
+    }, [resultWithDate])
+
+    useEffect(() => {
+      if(search && !isNaN(search) && resultByID.data) {
+        setOrders(resultByID.data.user_order)
+        setCount(1)
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resultByID])
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -141,6 +155,7 @@ const All = ({ detailOrder }) => {
             </FormControl>
           </Box>
         </Box>
+        <Typography>* When you select Date filter fields, you can export data as a <em>CVS file</em> by clicking <em>EXPORT button</em> at the bottom on table.</Typography>
         <Box
           sx={{
             display: 'flex',
@@ -187,7 +202,7 @@ const All = ({ detailOrder }) => {
                 orders.map((row, index) => (
                   <TableRow onClick={() => null} key={index} hover role="checkbox" tabIndex={-1} >
                     <TableCell>
-                      {row.id.substring(0,8)}
+                      {row.order_readable_id}
                     </TableCell>
                     <TableCell>
                       {row.user.name}

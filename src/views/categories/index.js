@@ -187,12 +187,12 @@ const Index = () => {
                       <TableCell>
                         {row.id}
                       </TableCell>
-                      <TableCell >
-                        <Avatar
-                            alt="Category"
-                            src={row.product_category_image_url}
-                            sx={{ width: 56, height: 56 }}
-                        >C</Avatar>
+                    <TableCell >
+                      <Avatar
+                          alt="Category"
+                          src={row.product_category_image_url}
+                          sx={{ width: 56, height: 56 }}
+                      >C</Avatar>
                     </TableCell>
                     <TableCell>
                       {row.product_category_name}

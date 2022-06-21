@@ -12,15 +12,12 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TextField,
-  FormControl,
   Avatar,
 } from "@mui/material";
 
-import { useLazyQuery } from "@apollo/client";
-import { PRODUCTS } from "../../gql/loyalty_products";
-
-import CreateProduct from "../../components/LoyaltyProducts/CreateLoyaltyProduct";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { BLOGS, UPDATE_POSITION } from "../../gql/blog";
+import CreateBlog from "../../components/blogs/CreateBlog";
 
 const style = {
   position: "absolute",
@@ -28,42 +25,48 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: "100vw",
-  maxHeight: "100vh",
+  height: "100vh",
   overflow: "scroll",
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
 };
-
-const Index = () => {
+const Index = ({ homeAlert }) => {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [offset, setOffset] = useState(0);
-  const [products, setProducts] = useState(null);
-  const [search, setSearch] = useState("");
+  const [blogs, setBlogs] = useState(null);
+  const [open, setOpen] = useState(false);
 
-  const [loadProducts, result] = useLazyQuery(PRODUCTS);
+  const [loadBlogs, result] = useLazyQuery(BLOGS);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    result.refetch();
-    setOpen(false);
-  };
+  const [updatePosition] = useMutation(UPDATE_POSITION, {
+    onError: (error) => {
+      console.log("error: ", error);
+    },
+    onCompleted: (res) => {
+      homeAlert(`Blog have been put to the top.`);
+    },
+    refetchQueries: [BLOGS],
+  });
 
   useEffect(() => {
-    loadProducts({
-      variables: { limit: rowsPerPage, offset: offset, search: `%${search}%` },
+    loadBlogs({
+      variables: {
+        limit: rowsPerPage,
+        offset: offset,
+      },
     });
-  }, [loadProducts, offset, rowsPerPage, search]);
+  }, [loadBlogs, offset, rowsPerPage]);
 
   useEffect(() => {
     if (result.data) {
-      setProducts(result.data.loyalty_products);
-      setCount(Number(result.data?.loyalty_products_aggregate.aggregate.count));
+      setBlogs(result.data.blog_data);
+      setCount(Number(result.data?.blog_data_aggregate.aggregate.count));
     }
   }, [result]);
 
@@ -77,7 +80,7 @@ const Index = () => {
     setPage(0);
   };
 
-  if (!products) {
+  if (!blogs) {
     return (
       <div>
         <em>Loading...</em>
@@ -85,8 +88,14 @@ const Index = () => {
     );
   }
 
-  const detailProdcut = (product) => {
-    navigate(`/loyalty_product/${product.id}`);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    result.refetch();
+    setOpen(false);
+  };
+
+  const detailBlog = (product) => {
+    navigate(`/blog/${product.id}`);
   };
 
   return (
@@ -94,7 +103,7 @@ const Index = () => {
       <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
           <Link to="/">Dashboard</Link>
-          <span>Loyalty Products</span>
+          <span>Blogs</span>
         </Breadcrumbs>
       </div>
       <Box
@@ -106,19 +115,8 @@ const Index = () => {
         }}
       >
         <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>
-          {open ? "Close" : "New Product"}
+          {open ? "Close" : "Create Blog"}
         </Button>
-        <FormControl sx={{ width: 300 }}>
-          <TextField
-            id="outlined-search"
-            label="Search by Name"
-            type="search"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-            }}
-          />
-        </FormControl>
       </Box>
       <Box
         sx={{
@@ -135,46 +133,45 @@ const Index = () => {
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell style={{ minWidth: 20 }}>ID</TableCell>
+                <TableCell style={{ minWidth: 70 }}>Title</TableCell>
                 <TableCell style={{ minWidth: 60 }}>Image</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Name</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Category</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Point Price</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Amount Left</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Expired Date</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Created At</TableCell>
-                <TableCell style={{ minWidth: 70 }}>Updated At</TableCell>
-                <TableCell style={{ minWidth: 50 }}>Detail</TableCell>
+                <TableCell style={{ minWidth: 60 }}>Created At</TableCell>
+                <TableCell style={{ minWidth: 70 }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {products?.map((row) => {
+              {blogs?.map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                    <TableCell>{row.id.substring(0, 8)}</TableCell>
+                    <TableCell>{row.title}</TableCell>
                     <TableCell>
                       <Avatar
                         alt="Product"
-                        src={row.product_image_url}
+                        src={row.title_image_url}
                         sx={{ width: 56, height: 56 }}
                       >
-                        P
+                        B
                       </Avatar>
                     </TableCell>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>
-                      {row.product_category?.product_category_name}
-                    </TableCell>
-                    <TableCell>{row.point_price}</TableCell>
-                    <TableCell>{row.amount_left}</TableCell>
-                    <TableCell>{row.expiry_date}</TableCell>
                     <TableCell>{row.created_at.substring(0, 10)}</TableCell>
-                    <TableCell>{row.updated_at.substring(0, 10)}</TableCell>
                     <TableCell>
+                      <Button
+                        color="primary"
+                        onClick={() =>
+                          updatePosition({
+                            variables: {
+                              id: row.id,
+                              updateAt: new Date().toISOString(),
+                            },
+                          })
+                        }
+                      >
+                        Put to Top
+                      </Button>
                       <Button
                         size="small"
                         color="secondary"
-                        onClick={() => detailProdcut(row)}
+                        onClick={() => detailBlog(row)}
                       >
                         Detail
                       </Button>
@@ -194,20 +191,20 @@ const Index = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <div style={{ minHeight: "auto" }}>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-            sx={{ width: "100vw" }}
-          >
-            <Box sx={style}>
-              <CreateProduct handleClose={handleClose} />
-            </Box>
-          </Modal>
-        </div>
       </Box>
+      <div style={{ minHeight: "auto" }}>
+        <Modal
+          open={open}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          sx={{ width: "100vw" }}
+        >
+          <Box sx={style}>
+            <CreateBlog handleClose={handleClose} />
+          </Box>
+        </Modal>
+      </div>
     </div>
   );
 };

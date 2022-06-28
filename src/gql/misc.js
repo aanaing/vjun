@@ -1,40 +1,48 @@
-import { gql } from '@apollo/client'
+import { gql } from "@apollo/client";
 
 export const GET_IMAGE_UPLOAD_URL = gql`
-    mutation Get_Image_Upload_Url {
-        getImageUploadUrl {
-        error
-        imageName
-        imageUploadUrl
-        message
-        }
+  mutation Get_Image_Upload_Url {
+    getImageUploadUrl {
+      error
+      imageName
+      imageUploadUrl
+      message
     }
-`
+  }
+`;
 
 export const DELETE_IMAGE = gql`
-mutation DeletImage ($image_name: String!) {
+  mutation DeletImage($image_name: String!) {
     deleteImage(imageName: $image_name) {
-        error
-        message
+      error
+      message
     }
-}
-`
+  }
+`;
 
 export const CATEGORIES = gql`
-query Categories {
+  query Categories {
     product_categories {
-        id
-        product_category_name
+      id
+      product_category_name
     }
-}
-`
+  }
+`;
 
 export const BRANDS = gql`
-query brands {
+  query brands {
     brand_name {
       id
       name
     }
   }
-  
-`
+`;
+
+export const MODEL_IDS = gql`
+  query Customization_Model {
+    customization_model {
+      id
+      model_name
+    }
+  }
+`;

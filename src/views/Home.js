@@ -20,6 +20,8 @@ const Products = lazy(() => import("./products/index"));
 const Product = lazy(() => import("./products/Product"));
 const Orders = lazy(() => import("./orders/index"));
 const Order = lazy(() => import("./orders/Order"));
+const CustomizeOrders = lazy(() => import("./customize_orders/index"));
+const CustomizeOrder = lazy(() => import("./customize_orders/CustomizeOrder"));
 const Categories = lazy(() => import("./categories/index"));
 const Users = lazy(() => import("./users/index"));
 const User = lazy(() => import("./users/User"));
@@ -115,6 +117,8 @@ const Admin = () => {
               />
               <Route path="/orders" element={<Orders />} />
               <Route path="/order/:id" element={<Order />} />
+              <Route path="/customize_orders" element={<CustomizeOrders />} />
+              <Route path="/customize_order/:id" element={<CustomizeOrder />} />
               <Route path="/claimed_histories" element={<Claimeds />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/users" element={<Users />} />

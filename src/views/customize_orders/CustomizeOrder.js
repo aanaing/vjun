@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { ORDERS_BY_ID, UPDATE_ORDER_STATUS } from "../../gql/orders";
-import OrdreItemTable from "../../components/orders/OrderItemTable";
 
 import {
   Breadcrumbs,
@@ -17,6 +15,10 @@ import {
   Modal,
   Alert,
 } from "@mui/material";
+import {
+  CUSTOMIZE_ORDER,
+  UPDATE_CUSTOMIZE_ORDER,
+} from "../../gql/customization_order";
 
 const style = {
   position: "absolute",
@@ -34,35 +36,15 @@ const Order = () => {
   const { id } = useParams();
   const [showAlert, setShowAlert] = useState({ message: "", isError: false });
   const [open, setOpen] = useState(false);
-  const result = useQuery(ORDERS_BY_ID, { variables: { id: id } });
+  const result = useQuery(CUSTOMIZE_ORDER, { variables: { id: id } });
 
-  const [update] = useMutation(UPDATE_ORDER_STATUS, {
-    onError: (error) => {
-      console.log("error : ", error);
-      setShowAlert({ message: "Error on server", isError: true });
-      setTimeout(() => {
-        setShowAlert({ message: "", isError: false });
-      }, 2000);
-    },
-    onCompleted: () => {
-      handleClose();
-      setShowAlert({
-        message: "Order's status have been changed to cancelled.",
-        isError: false,
-      });
-      setTimeout(() => {
-        setShowAlert({ message: "", isError: false });
-      }, 2000);
-    },
-  });
-
-  const [updateStatus] = useMutation(UPDATE_ORDER_STATUS, {
+  const [updateStatus] = useMutation(UPDATE_CUSTOMIZE_ORDER, {
     onError: (error) => {
       console.log("error : ", error);
     },
     onCompleted: (r) => {
       setShowAlert({
-        message: `Order's status have been changed to ${r.update_user_order_by_pk.order_status}`,
+        message: `Coutomize Order's status have been changed to ${r.update_customization_order_by_pk.order_status}`,
         isError: false,
       });
       setTimeout(() => {
@@ -86,14 +68,14 @@ const Order = () => {
     setOpen(false);
   };
 
-  const order = result?.data.user_order_by_pk;
+  const order = result?.data.customization_order_by_pk;
 
   return (
     <div>
       <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
           <Link to="/">Dashboard</Link>
-          <Link to="/orders">Orders</Link>
+          <Link to="/customize_orders">Customize Orders</Link>
           <span>{id}</span>
         </Breadcrumbs>
       </div>
@@ -104,7 +86,7 @@ const Order = () => {
       >
         {order.order_status[0].toUpperCase() +
           order.order_status.slice(1, order.order_status.length)}{" "}
-        Order
+        Customize Order
       </Typography>
       <Box
         sx={{
@@ -120,21 +102,43 @@ const Order = () => {
         <Box>
           <Box>
             <CardContent sx={{ display: "flex", paddingInline: "0" }}>
-              {order.payment_screenshot_image_url &&
-                order.payment_screenshot_image_url !== "null" && (
-                  <CardMedia
-                    sx={{ flex: 1 }}
-                    component="img"
-                    height="194"
-                    image={order.payment_screenshot_image_url}
-                    alt="Payment screenshot"
-                    className="card-media order-card-media"
-                  />
-                )}
+              <Box sx={{ flex: 1 }}>
+                {order.payment_screenshot_image_url &&
+                  order.payment_screenshot_image_url !== "null" && (
+                    <>
+                      <CardMedia
+                        component="img"
+                        height="104"
+                        image={order.payment_screenshot_image_url}
+                        alt="Payment screenshot"
+                        className="card-media order-card-media"
+                      />
+                      <Typography variant="span" component="div">
+                        Payment Screenshot
+                      </Typography>
+                    </>
+                  )}
+                {order.customization_image_url &&
+                  order.customization_image_url !== "null" && (
+                    <>
+                      <CardMedia
+                        sx={{ mt: 2 }}
+                        component="img"
+                        height="104"
+                        image={order.customization_image_url}
+                        alt="Customized photo"
+                        className="card-media order-card-media"
+                      />
+                      <Typography variant="span" component="div">
+                        Customized Photo
+                      </Typography>
+                    </>
+                  )}
+              </Box>
               <Box
                 sx={{
-                  flex: 4,
-                  mx: 3,
+                  flex: 3,
+                  ml: 5,
                   display: "flex",
                   justifyContent: "space-between",
                 }}
@@ -149,7 +153,6 @@ const Order = () => {
                   </ListItem>
                   <ListItem>
                     <ListItemText
-                      // primary="User's name"
                       secondary={order.user.name}
                       primaryTypographyProps={{ fontWeight: "bold" }}
                     >
@@ -166,11 +169,13 @@ const Order = () => {
                   </ListItem>
                   <ListItem>
                     <ListItemText
-                      primary="Payment Method"
-                      secondary={order.payment_method}
+                      primary="Model Name"
+                      secondary={order.model_name}
                       primaryTypographyProps={{ fontWeight: "bold" }}
+                      secondaryTypographyProps={{ fontWeight: "bold" }}
                     />
                   </ListItem>
+
                   <ListItem>
                     <ListItemText
                       primary="Address"
@@ -180,8 +185,6 @@ const Order = () => {
                       primaryTypographyProps={{ fontWeight: "bold" }}
                     />
                   </ListItem>
-                </Box>
-                <Box sx={{ flex: 1 }}>
                   <ListItem>
                     <ListItemText
                       primary="Total Cost"
@@ -207,6 +210,13 @@ const Order = () => {
                 <Box sx={{ flex: 1 }}>
                   <ListItem>
                     <ListItemText
+                      primary="Payment Method"
+                      secondary={order.payment_method}
+                      primaryTypographyProps={{ fontWeight: "bold" }}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
                       primary="Reciver Account Name"
                       secondary={order.payment_receiver_account_number}
                       primaryTypographyProps={{ fontWeight: "bold" }}
@@ -224,6 +234,14 @@ const Order = () => {
                       primary="Payment Service Name"
                       secondary={order.payment_service_name}
                       primaryTypographyProps={{ fontWeight: "bold" }}
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primary="Note"
+                      secondary={order.note}
+                      primaryTypographyProps={{ fontWeight: "bold" }}
+                      secondaryTypographyProps={{ fontWeight: "bold" }}
                     />
                   </ListItem>
                 </Box>
@@ -313,7 +331,9 @@ const Order = () => {
                 </Button>
                 <Button
                   onClick={() =>
-                    update({ variables: { id: order.id, status: "cancelled" } })
+                    updateStatus({
+                      variables: { id: order.id, status: "cancelled" },
+                    })
                   }
                 >
                   Confirm
@@ -322,7 +342,6 @@ const Order = () => {
             </Box>
           </Modal>
         </Box>
-        <OrdreItemTable items={order.order_items} />
       </Box>
       {showAlert.message && !showAlert.isError && (
         <Alert

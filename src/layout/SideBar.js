@@ -9,13 +9,14 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LoyaltyIcon from "@mui/icons-material/Loyalty";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BrokenImageIcon from "@mui/icons-material/BrokenImage";
 import StoreIcon from "@mui/icons-material/Store";
 import SegmentIcon from "@mui/icons-material/Segment";
+import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
+import CategoryIcon from "@mui/icons-material/Category";
 
 import { Box, Avatar, Divider } from "@mui/material";
 import logo from "../static/logo192.png";
@@ -67,6 +68,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
             Orders
           </ListItem>
         </Link>
+        <Link to="/customize_orders" className="nav-link">
+          <ListItem button className="nav-btn">
+            <ListItemIcon>
+              <ShoppingBagIcon className="nav-link-icon" />
+            </ListItemIcon>
+            Customize Orders
+          </ListItem>
+        </Link>
         <Link to="/products" className="nav-link">
           <ListItem button className="nav-btn">
             <ListItemIcon>
@@ -102,7 +111,7 @@ const SideBar = ({ handleDrawerClose, open }) => {
         <Link to="/categories" className="nav-link">
           <ListItem button className="nav-btn">
             <ListItemIcon>
-              <ShoppingBasketIcon className="nav-link-icon" />
+              <CategoryIcon className="nav-link-icon" />
             </ListItemIcon>
             Categories
           </ListItem>

@@ -36,11 +36,13 @@ const fileTypes = [
 ];
 
 let colors = [
-  { label: "Red", value: "Red" },
-  { label: "Green", value: "Green" },
-  { label: "Blue", value: "Blue" },
-  { label: "White", value: "White" },
-  { label: "Skyblue", value: "Skyblue" },
+  { label: "Red", value: "red" },
+  { label: "Green", value: "green" },
+  { label: "Blue", value: "blue" },
+  { label: "White", value: "white" },
+  { label: "Skyblue", value: "skyblue" },
+  { label: "Salmon", value: "salmon" },
+  { lable: "Gray", value: "gray" },
 ];
 
 const CreateProductVariation = ({ product_id, handleClose }) => {

@@ -248,7 +248,20 @@ const Order = () => {
               </Box>
             </CardContent>
             <CardActions sx={{ justifyContent: "flex-end" }}>
-              {order.order_status?.includes("pending") && (
+              {!order.order_status?.includes("pending") && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  onClick={() => {
+                    updateStatus({
+                      variables: { id: order.id, status: "pending" },
+                    });
+                  }}
+                >
+                  Pending
+                </Button>
+              )}
+              {!order.order_status?.includes("verified") && (
                 <Button
                   variant="contained"
                   color="info"
@@ -261,7 +274,7 @@ const Order = () => {
                   Verifie
                 </Button>
               )}
-              {order.order_status?.includes("verified") && (
+              {!order.order_status?.includes("delivering") && (
                 <Button
                   variant="contained"
                   color="info"
@@ -274,7 +287,7 @@ const Order = () => {
                   Delivering
                 </Button>
               )}
-              {order.order_status?.includes("delivering") && (
+              {!order.order_status?.includes("completed!") && (
                 <Button
                   variant="contained"
                   color="info"

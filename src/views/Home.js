@@ -35,6 +35,7 @@ const Claimeds = lazy(() => import("./claimed_history/index"));
 const Shops = lazy(() => import("./shops/index"));
 const Blogs = lazy(() => import("./blogs/index"));
 const Blog = lazy(() => import("./blogs/Blog"));
+const Models = lazy(() => import("./modelview/index"));
 
 const drawerWidth = 340;
 
@@ -138,6 +139,7 @@ const Admin = () => {
                 path="/blog/:id"
                 element={<Blog homeAlert={homeAlert} />}
               />
+              <Route path="/models" element={<Models />} />
             </Routes>
           </AuthContext.Provider>
         </Suspense>

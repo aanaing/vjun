@@ -59,6 +59,40 @@ export const CREATE_SHOP = gql`
   }
 `;
 
+export const UPDATE_SHOP = gql`
+  mutation Create_Shop(
+    $id: uuid!
+    $address: String!
+    $link: String!
+    $name: String!
+    $photo: String
+    $note: String
+    $phone: String!
+  ) {
+    update_shop_data_by_pk(
+      pk_columns: { id: $id }
+      _set: {
+        address: $address
+        map_link: $link
+        shop_name: $name
+        shop_photo: $photo
+        note: $note
+        phone: $phone
+      }
+    ) {
+      address
+      created_at
+      id
+      map_link
+      note
+      phone
+      shop_name
+      shop_photo
+      updated_at
+    }
+  }
+`;
+
 export const REMOVE_SHOP = gql`
   mutation Delete_Shop($id: uuid!, $image_name: String!) {
     delete_shop_data_by_pk(id: $id) {

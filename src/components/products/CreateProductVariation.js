@@ -39,6 +39,7 @@ let colors = [
   { label: "Red", value: "red" },
   { label: "Green", value: "green" },
   { label: "Blue", value: "blue" },
+  { label: "Black", value: "black" },
   { label: "White", value: "white" },
   { label: "Skyblue", value: "skyblue" },
   { label: "Salmon", value: "salmon" },

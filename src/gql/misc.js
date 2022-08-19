@@ -38,6 +38,15 @@ export const BRANDS = gql`
   }
 `;
 
+export const CUSTOMIZATION_MODELS = gql`
+  query Customization_Model {
+    customization_brand {
+      brand_name
+      id
+    }
+  }
+`;
+
 export const MODEL_IDS = gql`
   query Customization_Model {
     customization_model {

@@ -11,6 +11,7 @@ import { Button, Alert, Modal, Box, Typography } from "@mui/material";
 
 import { useMutation } from "@apollo/client";
 import {
+  ACTION_PRODUCT_VARIATION,
   DELETE_PRODUCT_VARIATION,
   PRODUCT_VARIATIONS,
 } from "../../gql/products";
@@ -58,7 +59,7 @@ export default function ProductVariationTable({ variationsProp, refresh }) {
     setVariations(variationsProp);
   }, [variationsProp]);
 
-  const [deleteVariation] = useMutation(DELETE_PRODUCT_VARIATION, {
+  const [actionVariation] = useMutation(ACTION_PRODUCT_VARIATION, {
     onError: (error) => {
       console.log("error : ", error);
       setShowAlert({ message: "Error on server", isError: true });
@@ -67,33 +68,34 @@ export default function ProductVariationTable({ variationsProp, refresh }) {
       }, 3000);
     },
     onCompleted: () => {
-      setVariations(variations.filter((v) => v.id !== id));
-      setShowAlert({ message: "Variation have been removed.", isError: false });
+      setShowAlert({ message: "Successfully changed", isError: false });
       setTimeout(() => {
         setShowAlert({ message: "", isError: false });
       }, 3000);
       setId("");
+      setVariation(null);
       refresh();
     },
-    refetchQueries: [{ query: PRODUCT_VARIATIONS }],
   });
 
-  const handleOpen = (id) => {
+  const handleOpen = (id, data) => {
     setId(id);
+    setVariation(data);
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleDelete = () => {
-    let variation = variations.find((v) => v.id === id);
-    let image_url = variation.variation_image_url;
-    let image_name = image_url.substring(
-      image_url.lastIndexOf("/") + 1,
-      image_url.lenght
-    );
-    deleteVariation({ variables: { id: id, image_name: image_name } });
+  const handleAction = () => {
+    // let variation = variations.find((v) => v.id === id);
+    // let image_url = variation.variation_image_url;
+    // let image_name = image_url.substring(
+    //   image_url.lastIndexOf("/") + 1,
+    //   image_url.lenght
+    // );
+    // deleteVariation({ variables: { id: id, image_name: image_name } });
+    actionVariation({ variables: { id: id, action: !variation.disabled } });
     handleClose();
   };
 
@@ -151,6 +153,7 @@ export default function ProductVariationTable({ variationsProp, refresh }) {
                   <TableCell>
                     <Button
                       color="primary"
+                      size="small"
                       sx={{ mr: 1 }}
                       variant="contained"
                       onClick={() => handleOpenU(row)}
@@ -158,11 +161,12 @@ export default function ProductVariationTable({ variationsProp, refresh }) {
                       Edit
                     </Button>
                     <Button
-                      color="error"
+                      color={row.disabled ? "secondary" : "error"}
+                      size="small"
                       variant="contained"
-                      onClick={() => handleOpen(row.id)}
+                      onClick={() => handleOpen(row.id, row)}
                     >
-                      Remove
+                      {row.disabled ? "Enable" : "Disable"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -180,16 +184,16 @@ export default function ProductVariationTable({ variationsProp, refresh }) {
       >
         <Box sx={style}>
           <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-            Remove proudct's variation
+            {variation?.disabled ? "Enable" : "Disable"} proudct's variation
           </Typography>
           <Typography id="keep-mounted-modal-description" sx={{ mt: 2 }}>
-            Are you sure want to remove?
+            Are you sure want to {variation?.disabled ? "enable" : "disable"}?
           </Typography>
           <Box sx={{ textAlign: "right", mt: 2 }}>
             <Button color="secondary" onClick={handleClose}>
               Cancel
             </Button>
-            <Button onClick={handleDelete}>Confirm</Button>
+            <Button onClick={handleAction}>Confirm</Button>
           </Box>
         </Box>
       </Modal>

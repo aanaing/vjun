@@ -68,6 +68,7 @@ export const PRODUCT_BY_ID = gql`
       discount_eligible
       sold_amount
       barcode
+      disabled
       product_variations {
         color
         created_at
@@ -77,6 +78,7 @@ export const PRODUCT_BY_ID = gql`
         updated_at
         variation_image_url
         variation_name
+        disabled
         customization_model {
           id
           model_name
@@ -100,6 +102,7 @@ export const PRODUCT_VARIATIONS = gql`
       sold_amount
       variation_image_url
       variation_name
+      disabled
       customization_model {
         id
         model_name
@@ -118,6 +121,7 @@ export const PRODUCT_VARIATIONS_BY_PK = gql`
       sold_amount
       variation_image_url
       variation_name
+      disabled
       customization_model {
         id
         model_name
@@ -216,6 +220,28 @@ export const DELETE_PRODUCT = gql`
     deleteImage(imageName: $image_name) {
       error
       message
+    }
+  }
+`;
+
+export const ACTION_PRODUCT = gql`
+  mutation Action_Product($id: uuid!, $action: Boolean!) {
+    update_products_by_pk(
+      pk_columns: { id: $id }
+      _set: { disabled: $action }
+    ) {
+      created_at
+    }
+  }
+`;
+
+export const ACTION_PRODUCT_VARIATION = gql`
+  mutation Action_Product_Variation($id: uuid!, $action: Boolean!) {
+    update_product_variations_by_pk(
+      pk_columns: { id: $id }
+      _set: { disabled: $action }
+    ) {
+      created_at
     }
   }
 `;

@@ -21,11 +21,26 @@ import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 
 import CreateShop from "../../components/shops/CreateShop";
+import UpdateShop from "../../components/shops/UpdateShop";
 
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { SHOPS, REMOVE_SHOP } from "../../gql/shops";
 
 const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "100vw",
+  maxHeight: "100vh",
+  overflow: "scroll",
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+const styleU = {
   position: "absolute",
   top: "50%",
   left: "50%",
@@ -53,6 +68,7 @@ const styleD = {
 
 const Index = () => {
   const [open, setOpen] = useState(false);
+  const [openU, setOpenU] = useState(false);
   const [openD, setOpenD] = useState(false);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -121,6 +137,15 @@ const Index = () => {
     result.refetch();
     setOpen(false);
   };
+  const handleOpenU = (shop) => {
+    setShop(shop);
+    setOpenU(true);
+  };
+  const handleCloseU = () => {
+    result.refetch();
+    setShop(null);
+    setOpenU(false);
+  };
   const handleOpenD = () => setOpenD(true);
   const handleCloseD = () => setOpenD(false);
 
@@ -145,6 +170,13 @@ const Index = () => {
       image_url.lenght
     );
     deleteShop({ variables: { id: shop.id, image_name: image_name } });
+  };
+
+  const shopAlert = (message, isError = false) => {
+    setShowAlert({ message: message, isError: isError });
+    setTimeout(() => {
+      setShowAlert({ message: "", isError: false });
+    }, 3000);
   };
 
   return (
@@ -228,6 +260,13 @@ const Index = () => {
                     <TableCell>{row.created_at.substring(0, 10)}</TableCell>
                     <TableCell>
                       <Button
+                        onClick={() => handleOpenU(row)}
+                        size="small"
+                        color="primary"
+                      >
+                        Edit
+                      </Button>
+                      <Button
                         size="small"
                         color="error"
                         onClick={() => {
@@ -279,6 +318,24 @@ const Index = () => {
               </Button>
               <Button onClick={handleDelete}>Confirm</Button>
             </Box>
+          </Box>
+        </Modal>
+      </div>
+      <div style={{ minHeight: "auto" }}>
+        <Modal
+          open={openU}
+          onClose={handleCloseU}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={styleU}>
+            {/* <UpdateProduct productAlert={productAlert} product_id={product.id} product={{ ...product, product_variations: undefined, brand_name: undefined, category: undefined }} handleClose={handleCloseU} /> */}
+            <UpdateShop
+              shopAlert={shopAlert}
+              shop_id={shop?.id}
+              shop={shop}
+              handleClose={handleCloseU}
+            />
           </Box>
         </Modal>
       </div>

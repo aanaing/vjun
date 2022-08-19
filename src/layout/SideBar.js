@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -17,6 +17,7 @@ import StoreIcon from "@mui/icons-material/Store";
 import SegmentIcon from "@mui/icons-material/Segment";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import CategoryIcon from "@mui/icons-material/Category";
+import AdUnitsIcon from "@mui/icons-material/AdUnits";
 
 import { Box, Avatar, Divider } from "@mui/material";
 import logo from "../static/logo192.png";
@@ -34,8 +35,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const SideBar = ({ handleDrawerClose, open }) => {
-  const theme = useTheme();
-
   return (
     <Drawer
       sx={{
@@ -155,6 +154,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
               <SettingsIcon className="nav-link-icon" />
             </ListItemIcon>
             Server Config
+          </ListItem>
+        </Link>
+        <Link to="/models" className="nav-link">
+          <ListItem button className="nav-btn">
+            <ListItemIcon>
+              <AdUnitsIcon className="nav-link-icon" />
+            </ListItemIcon>
+            Models
           </ListItem>
         </Link>
         <Link to="/banking_accounts" className="nav-link">

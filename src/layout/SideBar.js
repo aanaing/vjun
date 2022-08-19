@@ -18,6 +18,7 @@ import SegmentIcon from "@mui/icons-material/Segment";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import CategoryIcon from "@mui/icons-material/Category";
 import AdUnitsIcon from "@mui/icons-material/AdUnits";
+import ViewCarouselIcon from "@mui/icons-material/ViewCarousel";
 
 import { Box, Avatar, Divider } from "@mui/material";
 import logo from "../static/logo192.png";
@@ -129,6 +130,14 @@ const SideBar = ({ handleDrawerClose, open }) => {
               <BrokenImageIcon className="nav-link-icon" />
             </ListItemIcon>
             Ads
+          </ListItem>
+        </Link>
+        <Link to="/banners" className="nav-link">
+          <ListItem button className="nav-btn">
+            <ListItemIcon>
+              <ViewCarouselIcon className="nav-link-icon" />
+            </ListItemIcon>
+            Banners
           </ListItem>
         </Link>
         <Link to="/shops" className="nav-link">

@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation } from "@apollo/client";
-import { ADS, DELETE_ADS, UPDATE_POSITION } from "../../gql/ads";
-import { DELETE_IMAGE } from "../../gql/misc";
+import { ACTION_BANNER, BANNERS } from "../../gql/banners";
 import {
   Box,
   Breadcrumbs,
@@ -15,8 +14,8 @@ import {
   CardMedia,
   CardContent,
 } from "@mui/material";
-import CreateAds from "../../components/Ads/CreateAds";
-import UpdateAds from "../../components/Ads/UpdateAds";
+import CreateBanner from "../../components/banners/CreateBanner";
+import UpdateBanner from "../../components/banners/UpdateBanner";
 
 const style = {
   position: "absolute",
@@ -30,61 +29,30 @@ const style = {
   p: 4,
 };
 
-const styleD = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 350,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-const Index = () => {
+const Banners = () => {
   const [showAlert, setShowAlert] = useState({ message: "", isError: false });
   const [open, setOpen] = useState(false);
   const [openE, setOpenE] = useState(false);
-  const [openD, setOpenD] = useState(false);
-  const [ad, setAd] = useState(null);
+  const [banner, setBanner] = useState(null);
 
-  const result = useQuery(ADS);
+  const result = useQuery(BANNERS);
 
-  const [deleteAds] = useMutation(DELETE_ADS, {
-    onError: (error) => {
-      console.log("error : ", error);
-    },
-    onCompleted: () => {
-      setShowAlert({ message: `Ads have been removed.`, isError: false });
-      setTimeout(() => {
-        setShowAlert({ message: "", isError: false });
-      }, 3000);
-      handleCloseD();
-    },
-  });
-
-  const [deleteImage] = useMutation(DELETE_IMAGE, {
-    onError: (error) => {
-      console.log("error : ", error);
-    },
-  });
-
-  const [updatePosition] = useMutation(UPDATE_POSITION, {
+  const [actionBanner] = useMutation(ACTION_BANNER, {
     onError: (error) => {
       console.log("error: ", error);
     },
     onCompleted: (res) => {
       setShowAlert({
-        message: `Ads "${res?.update_ads_by_pk.title}" have been put to the top.`,
+        message: `Banner "${res?.update_banner_by_pk.title}" have been ${
+          !res?.update_banner_by_pk.disabled ? "enabled" : "disabled"
+        }.`,
         isError: false,
       });
       setTimeout(() => {
         setShowAlert({ message: "", isError: false });
       }, 3000);
-      handleCloseD();
     },
-    refetchQueries: [ADS],
+    refetchQueries: [BANNERS],
   });
 
   if (result.loading) {
@@ -101,50 +69,29 @@ const Index = () => {
     setOpen(false);
   };
   const handleOpenE = (row) => {
-    setAd(row);
+    setBanner(row);
     setOpenE(true);
   };
   const handleCloseE = () => {
     result.refetch();
     setOpenE(false);
   };
-  const handleOpenD = (row) => {
-    setAd(row);
-    setOpenD(true);
-  };
-  const handleCloseD = () => {
-    result.refetch();
-    setOpenD(false);
-  };
 
-  const adsAlert = (message, isError = false) => {
+  const bannerAlert = (message, isError = false) => {
     setShowAlert({ message: message, isError: isError });
     setTimeout(() => {
       setShowAlert({ message: "", isError: false });
     }, 3000);
   };
 
-  const handleDelete = () => {
-    if (!ad) {
-      return;
-    }
-    let image_url = ad.image_url;
-    let image_name = image_url.substring(
-      image_url.lastIndexOf("/") + 1,
-      image_url.lenght
-    );
-    deleteAds({ variables: { id: ad.id } });
-    deleteImage({ variables: { image_name: image_name } });
-  };
-
-  const ads = result.data.ads;
+  const banners = result.data.banner;
 
   return (
     <div>
       <div role="presentation">
         <Breadcrumbs aria-label="breadcrumb">
           <Link to="/">Dashboard</Link>
-          <span>Ads</span>
+          <span>Banners</span>
         </Breadcrumbs>
       </div>
       <Box
@@ -156,7 +103,7 @@ const Index = () => {
         }}
       >
         <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>
-          {open ? "Close" : "Add Ads"}
+          {open ? "Close" : "Add Banner"}
         </Button>
       </Box>
       <Box
@@ -170,13 +117,13 @@ const Index = () => {
           },
         }}
       >
-        {ads.map((row, index) => (
+        {banners.map((row, index) => (
           <Card sx={{ maxWidth: 345 }} key={index}>
             <CardMedia
               component="img"
               height="140"
               image={row.image_url}
-              alt="Ads"
+              alt="Banner"
             />
             <CardContent>
               <Typography
@@ -214,15 +161,15 @@ const Index = () => {
               <Button
                 color="secondary"
                 onClick={() =>
-                  updatePosition({
+                  actionBanner({
                     variables: {
                       id: row.id,
-                      updateAt: new Date().toISOString(),
+                      action: !row.disabled,
                     },
                   })
                 }
               >
-                Put to Top
+                {row.disabled ? "Enable" : "Disable"}
               </Button>
               <Button
                 onClick={() => handleOpenE(row)}
@@ -231,39 +178,10 @@ const Index = () => {
               >
                 Edit
               </Button>
-              <Button
-                onClick={() => handleOpenD(row)}
-                color="error"
-                size="small"
-              >
-                Remove
-              </Button>
             </CardActions>
           </Card>
         ))}
       </Box>
-      <Modal
-        keepMounted
-        open={openD}
-        onClose={handleCloseD}
-        aria-labelledby="keep-mounted-modal-title"
-        aria-describedby="keep-mounted-modal-description"
-      >
-        <Box sx={styleD}>
-          <Typography id="keep-mounted-modal-title" variant="h6" component="h2">
-            Remove Ads
-          </Typography>
-          <Typography id="keep-mounted-modal-description" sx={{ mt: 2 }}>
-            Are you sure want to remove?
-          </Typography>
-          <Box sx={{ textAlign: "right", mt: 2 }}>
-            <Button color="secondary" onClick={handleCloseD}>
-              Cancel
-            </Button>
-            <Button onClick={handleDelete}>Confirm</Button>
-          </Box>
-        </Box>
-      </Modal>
       <div style={{ minHeight: "auto" }}>
         <Modal
           open={open}
@@ -272,7 +190,7 @@ const Index = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <CreateAds adsAlert={adsAlert} handleClose={handleClose} />
+            <CreateBanner bannerAlert={bannerAlert} handleClose={handleClose} />
           </Box>
         </Modal>
       </div>
@@ -284,7 +202,11 @@ const Index = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <UpdateAds adsAlert={adsAlert} handleClose={handleCloseE} ad={ad} />
+            <UpdateBanner
+              bannerAlert={bannerAlert}
+              handleClose={handleCloseE}
+              banner={banner}
+            />
           </Box>
         </Modal>
       </div>
@@ -308,4 +230,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Banners;

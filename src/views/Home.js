@@ -36,6 +36,7 @@ const Shops = lazy(() => import("./shops/index"));
 const Blogs = lazy(() => import("./blogs/index"));
 const Blog = lazy(() => import("./blogs/Blog"));
 const Models = lazy(() => import("./modelview/index"));
+const Banners = lazy(() => import("./banners/index"));
 
 const drawerWidth = 340;
 
@@ -140,6 +141,7 @@ const Admin = () => {
                 element={<Blog homeAlert={homeAlert} />}
               />
               <Route path="/models" element={<Models />} />
+              <Route path="/banners" element={<Banners />} />
             </Routes>
           </AuthContext.Provider>
         </Suspense>

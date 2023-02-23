@@ -11,7 +11,6 @@ import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Alert } from "@mui/material";
-
 import Header from "../layout/Header";
 import SideBar from "../layout/SideBar";
 
@@ -39,7 +38,6 @@ const Models = lazy(() => import("./modelview/index"));
 const Banners = lazy(() => import("./banners/index"));
 
 const drawerWidth = 340;
-
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     flexGrow: 1,
@@ -74,7 +72,6 @@ const Admin = () => {
   const navigate = useNavigate();
   const AuthContext = createContext();
   const [auth, setAuth] = useState(null);
-
   const handleDrawer = () => {
     setOpen(!open);
   };

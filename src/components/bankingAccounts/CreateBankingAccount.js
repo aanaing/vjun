@@ -109,3 +109,4 @@ const CreateBankingAccount = ({ handleClose, bankingAlert }) => {
 }
 
 export default CreateBankingAccount
+

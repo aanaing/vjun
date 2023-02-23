@@ -128,6 +128,7 @@ const Index = () => {
     if (!ad) {
       return;
     }
+
     let image_url = ad.image_url;
     let image_name = image_url.substring(
       image_url.lastIndexOf("/") + 1,
@@ -155,7 +156,7 @@ const Index = () => {
           my: 2,
         }}
       >
-        <Button onClick={handleOpen} variant="contained" sx={{ height: 50 }}>
+        <Button onClick={handleOpen} variant="contained" sx={{ height: 100 }}>
           {open ? "Close" : "Add Ads"}
         </Button>
       </Box>
@@ -213,6 +214,7 @@ const Index = () => {
             <CardActions>
               <Button
                 color="secondary"
+                variant="contained"
                 onClick={() =>
                   updatePosition({
                     variables: {
@@ -228,6 +230,7 @@ const Index = () => {
                 onClick={() => handleOpenE(row)}
                 color="primary"
                 size="small"
+                variant="contained"
               >
                 Edit
               </Button>
@@ -235,6 +238,7 @@ const Index = () => {
                 onClick={() => handleOpenD(row)}
                 color="error"
                 size="small"
+                variant="contained"
               >
                 Remove
               </Button>
@@ -256,7 +260,7 @@ const Index = () => {
           <Typography id="keep-mounted-modal-description" sx={{ mt: 2 }}>
             Are you sure want to remove?
           </Typography>
-          <Box sx={{ textAlign: "right", mt: 2 }}>
+          <Box sx={{ textAlign: "center", mt: 2, alignItems: "center" }}>
             <Button color="secondary" onClick={handleCloseD}>
               Cancel
             </Button>
